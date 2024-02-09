@@ -1,5 +1,11 @@
 # react-pane-system
 
+## 0.2.1
+
+### Patch Changes
+
+- 326c655: Modify npmignore
+
 ## 0.2.0
 
 ### Minor Changes

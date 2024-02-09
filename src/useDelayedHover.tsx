@@ -3,21 +3,21 @@
 import { useRef, useState } from 'react';
 
 const useDelayedHover = (delayMs: number = 300) => {
-  const [hover, setHover] = useState(false);
+  const [isHover, setIsHover] = useState(false);
   const timeout = useRef<number | null>(null);
 
   const onPointerEnter = () => {
     if (timeout.current) clearTimeout(timeout.current);
-    timeout.current = window.setTimeout(() => setHover(true), delayMs);
+    timeout.current = window.setTimeout(() => setIsHover(true), delayMs);
   };
 
   const onPointerLeave = () => {
-    if (timeout.current) clearTimeout(timeout.current);
-    setHover(false);
+    if (timeout.current) window.clearTimeout(timeout.current);
+    setIsHover(false);
   };
 
   return {
-    hover,
+    isHover,
     onPointerEnter,
     onPointerLeave
   };

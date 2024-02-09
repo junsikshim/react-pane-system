@@ -16,7 +16,7 @@ type DragState = {
 const RowSplitter = ({ offsetTop, onDrag }: RowSplitterProps) => {
   const ref = useRef<HTMLDivElement>(null);
   const dragState = useRef<DragState | null>(null);
-  const { hover, onPointerEnter, onPointerLeave } = useDelayedHover();
+  const { isHover, onPointerEnter, onPointerLeave } = useDelayedHover();
 
   useEffect(() => {
     if (!ref.current) return;
@@ -72,7 +72,7 @@ const RowSplitter = ({ offsetTop, onDrag }: RowSplitterProps) => {
         width: '100%',
         height: '4px',
         left: 0,
-        background: hover ? '#d4d4d4' : 'transparent',
+        background: isHover ? '#d4d4d4' : 'transparent',
         cursor: 'row-resize',
         zIndex: 10,
         transition: 'background-color 0.2s',

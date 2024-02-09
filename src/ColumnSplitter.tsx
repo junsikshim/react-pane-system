@@ -16,7 +16,7 @@ type DragState = {
 const ColumnSplitter = ({ offsetLeft, onDrag }: ColumnSplitterProps) => {
   const ref = useRef<HTMLDivElement>(null);
   const dragState = useRef<DragState | null>(null);
-  const { hover, onPointerEnter, onPointerLeave } = useDelayedHover();
+  const { isHover, onPointerEnter, onPointerLeave } = useDelayedHover();
 
   useEffect(() => {
     if (!ref.current) return;
@@ -72,7 +72,7 @@ const ColumnSplitter = ({ offsetLeft, onDrag }: ColumnSplitterProps) => {
         width: '4px',
         height: '100%',
         top: 0,
-        background: hover ? '#d4d4d4' : 'transparent',
+        background: isHover ? '#d4d4d4' : 'transparent',
         cursor: 'col-resize',
         zIndex: 10,
         transition: 'background-color 0.2s',

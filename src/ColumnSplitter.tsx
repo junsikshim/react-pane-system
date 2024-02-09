@@ -66,9 +66,17 @@ const ColumnSplitter = ({ offsetLeft, onDrag }: ColumnSplitterProps) => {
   return (
     <div
       ref={ref}
-      className={`splitter absolute w-1.5 h-full top-0 bg-transparent ${hover ? 'bg-gray-300' : ''} cursor-col-resize z-10 transition-colors`}
+      className="splitter"
       style={{
-        transform: `translateX(${offsetLeft - 3}px)`
+        position: 'absolute',
+        width: '4px',
+        height: '100%',
+        top: 0,
+        background: hover ? '#d4d4d4' : 'transparent',
+        cursor: 'col-resize',
+        zIndex: 10,
+        transition: 'background-color 0.2s',
+        transform: `translateX(${offsetLeft - 2}px)`
       }}
       onPointerEnter={onPointerEnter}
       onPointerLeave={onPointerLeave}

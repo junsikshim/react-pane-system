@@ -31,10 +31,12 @@ export const InnerPane = ({
 }: PropsWithChildren<InnerPaneProps>) => {
   return (
     <div
-      className="pane absolute h-full bg-zinc-900 border-r border-zinc-800 last-of-type:border-r-0"
+      className="pane"
       style={{
         left: `${left}px`,
-        width: `${width}px`
+        width: `${width}px`,
+        position: 'absolute',
+        height: '100%'
       }}
     >
       {splitter === 'left' && onSplitterDrag && (

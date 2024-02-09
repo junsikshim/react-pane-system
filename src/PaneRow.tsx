@@ -176,10 +176,12 @@ export const InnerPaneRow = ({
 
   return (
     <div
-      className="pane-row absolute w-full bg-zinc-900 border-b border-zinc-800 last-of-type:border-b-0"
+      className="pane-row"
       style={{
         top: `${top}px`,
-        height: `${height}px`
+        height: `${height}px`,
+        position: 'absolute',
+        width: '100%'
       }}
     >
       {splitter === 'top' && onSplitterDrag && (

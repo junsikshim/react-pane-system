@@ -15,7 +15,8 @@ import { PaneRowProps, InnerPaneRow } from './PaneRow';
 import { sizeToPixels, limit } from './utils';
 
 interface PaneSystemProps {
-  height: string;
+  width?: string;
+  height?: string;
 }
 
 export type Size = {
@@ -24,7 +25,8 @@ export type Size = {
 };
 
 const PaneSystem = ({
-  height: systemHeight,
+  width: systemWidth = '100%',
+  height: systemHeight = '100%',
   children
 }: PropsWithChildren<PaneSystemProps>) => {
   const ref = useRef<HTMLDivElement>(null);
@@ -176,8 +178,8 @@ const PaneSystem = ({
   return (
     <div
       ref={ref}
-      className="pane-system relative"
-      style={{ height: systemHeight }}
+      className="pane-system"
+      style={{ width: systemWidth, height: systemHeight, position: 'relative' }}
     >
       {rows}
     </div>

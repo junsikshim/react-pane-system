@@ -1,5 +1,11 @@
 # react-pane-system
 
+## 0.1.0
+
+### Minor Changes
+
+- 0e56b29: Implement basic functionality.
+
 ## 0.0.3
 
 ### Patch Changes

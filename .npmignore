@@ -3,4 +3,7 @@ src
 .github
 pnpm-lock.yaml
 tsconfig.json
-vite.config.ts
+.storybook
+stories
+.prettierrc
+

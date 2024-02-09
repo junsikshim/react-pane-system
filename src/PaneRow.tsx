@@ -19,6 +19,9 @@ export interface PaneRowProps extends PropsWithChildren {
   minHeight?: string;
   maxHeight?: string;
   splitter?: 'top' | 'bottom';
+  bgColor?: string;
+  borderWidth?: number;
+  borderColor?: string;
 }
 
 const PaneRow = ({ children }: PaneRowProps) => children;
@@ -39,6 +42,9 @@ export interface InnerPaneRowProps {
   columnMaxWidths?: string[];
   splitter?: 'top' | 'bottom';
   onSplitterDrag?: (dy: number) => void;
+  bgColor?: string;
+  borderWidth?: number;
+  borderColor?: string;
 }
 
 export const InnerPaneRow = ({
@@ -47,6 +53,9 @@ export const InnerPaneRow = ({
   height,
   splitter,
   onSplitterDrag,
+  bgColor,
+  borderWidth,
+  borderColor,
   children
 }: PropsWithChildren<InnerPaneRowProps>) => {
   // The widths of the Pane components in pixels.
@@ -163,7 +172,10 @@ export const InnerPaneRow = ({
           left,
           width: paneWidthPxs[index],
           splitter: pane.props.splitter,
-          onSplitterDrag: onPaneSplitterDrag(index)
+          onSplitterDrag: onPaneSplitterDrag(index),
+          bgColor: pane.props.bgColor ?? bgColor,
+          borderWidth: pane.props.borderWidth ?? borderWidth,
+          borderColor: pane.props.borderColor ?? borderColor
         },
         pane.props.children
       );
@@ -184,6 +196,19 @@ export const InnerPaneRow = ({
         width: '100%'
       }}
     >
+      {/* Border on the bottom side of the row */}
+      <div
+        style={{
+          position: 'absolute',
+          bottom: `${borderWidth}px`,
+          left: 0,
+          width: '100%',
+          height: `${borderWidth}px`,
+          backgroundColor: borderColor,
+          zIndex: 1
+        }}
+      />
+
       {splitter === 'top' && onSplitterDrag && (
         <RowSplitter offsetTop={0} onDrag={onSplitterDrag} />
       )}

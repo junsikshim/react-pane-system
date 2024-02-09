@@ -76,11 +76,11 @@ const ColumnSplitter = ({ offsetLeft, onDrag }: ColumnSplitterProps) => {
         cursor: 'col-resize',
         zIndex: 10,
         transition: 'background-color 0.2s',
-        transform: `translateX(${offsetLeft - 2}px)`
+        transform: `translateX(${offsetLeft - 3}px)`
       }}
       onPointerEnter={onPointerEnter}
       onPointerLeave={onPointerLeave}
-    ></div>
+    />
   );
 };
 

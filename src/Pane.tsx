@@ -9,6 +9,9 @@ export interface PaneProps extends PropsWithChildren {
   minWidth?: string;
   maxWidth?: string;
   splitter?: 'left' | 'right';
+  bgColor?: string;
+  borderWidth?: number;
+  borderColor?: string;
 }
 
 const Pane = ({ children }: PaneProps) => children;
@@ -20,6 +23,9 @@ export interface InnerPaneProps {
   width: number;
   splitter?: 'left' | 'right';
   onSplitterDrag?: (dx: number) => void;
+  bgColor?: string;
+  borderWidth?: number;
+  borderColor?: string;
 }
 
 export const InnerPane = ({
@@ -27,6 +33,9 @@ export const InnerPane = ({
   width,
   splitter,
   onSplitterDrag,
+  bgColor,
+  borderWidth,
+  borderColor,
   children
 }: PropsWithChildren<InnerPaneProps>) => {
   return (
@@ -36,9 +45,22 @@ export const InnerPane = ({
         left: `${left}px`,
         width: `${width}px`,
         position: 'absolute',
-        height: '100%'
+        height: '100%',
+        backgroundColor: bgColor
       }}
     >
+      {/* Border on the right side of the pane */}
+      <div
+        style={{
+          position: 'absolute',
+          top: 0,
+          right: `${borderWidth}px`,
+          width: `${borderWidth}px`,
+          height: '100%',
+          backgroundColor: borderColor
+        }}
+      />
+
       {splitter === 'left' && onSplitterDrag && (
         <ColumnSplitter offsetLeft={0} onDrag={onSplitterDrag} />
       )}

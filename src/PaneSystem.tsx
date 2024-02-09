@@ -17,6 +17,9 @@ import { sizeToPixels, limit } from './utils';
 interface PaneSystemProps {
   width?: string;
   height?: string;
+  bgColor?: string;
+  borderWidth?: number;
+  borderColor?: string;
 }
 
 export type Size = {
@@ -27,6 +30,9 @@ export type Size = {
 const PaneSystem = ({
   width: systemWidth = '100%',
   height: systemHeight = '100%',
+  bgColor = '#4b5563',
+  borderWidth = 1,
+  borderColor = '#909090',
   children
 }: PropsWithChildren<PaneSystemProps>) => {
   const ref = useRef<HTMLDivElement>(null);
@@ -164,7 +170,10 @@ const PaneSystem = ({
           top,
           height: rowHeightPxs[index],
           splitter: row.props.splitter,
-          onSplitterDrag: onRowSplitterDrag(index)
+          onSplitterDrag: onRowSplitterDrag(index),
+          bgColor: row.props.bgColor ?? bgColor,
+          borderWidth: row.props.borderWidth ?? borderWidth,
+          borderColor: row.props.borderColor ?? borderColor
         },
         row.props.children
       );

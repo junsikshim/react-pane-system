@@ -76,11 +76,11 @@ const RowSplitter = ({ offsetTop, onDrag }: RowSplitterProps) => {
         cursor: 'row-resize',
         zIndex: 10,
         transition: 'background-color 0.2s',
-        transform: `translateY(${offsetTop - 2}px)`
+        transform: `translateY(${offsetTop - 3}px)`
       }}
       onPointerEnter={onPointerEnter}
       onPointerLeave={onPointerLeave}
-    ></div>
+    />
   );
 };
 

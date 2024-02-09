@@ -1,5 +1,12 @@
 # react-pane-system
 
+## 0.1.1
+
+### Patch Changes
+
+- 77271d7: Apply 'use client'.
+  Apply CSS.
+
 ## 0.1.0
 
 ### Minor Changes

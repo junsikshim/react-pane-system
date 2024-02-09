@@ -1,3 +1,5 @@
+'use client';
+
 import { useRef, useState } from 'react';
 
 const useDelayedHover = (delayMs: number = 300) => {
@@ -17,7 +19,7 @@ const useDelayedHover = (delayMs: number = 300) => {
   return {
     hover,
     onPointerEnter,
-    onPointerLeave,
+    onPointerLeave
   };
 };
 

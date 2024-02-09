@@ -1,3 +1,5 @@
+'use client';
+
 import useDelayedHover from './useDelayedHover';
 import { useEffect, useRef } from 'react';
 

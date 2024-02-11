@@ -1,5 +1,11 @@
 # react-pane-system
 
+## 0.2.2
+
+### Patch Changes
+
+- 2c9acf1: Add basic stories.
+
 ## 0.2.1
 
 ### Patch Changes

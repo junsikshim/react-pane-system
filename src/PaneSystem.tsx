@@ -117,21 +117,19 @@ const PaneSystem = ({
   const onRowSplitterDrag = useCallback(
     (index: number) => (dy: number) => {
       const autoRowIndex = rowHeights.findIndex((h) => h === 'auto');
+      const min = rowMinHeightPxs[index];
+      const max = rowMaxHeightPxs[index];
 
       if (autoRowIndex === index - 1) {
         // The splitter is on the bottom side of the auto row.
         setRowHeightPxs((prev) => {
           const clone = [...prev];
 
-          const totalHeight = clone[index] + clone[index + 1];
-          const bottomHeight = limit(
-            clone[index + 1] - dy,
-            rowMinHeightPxs[index + 1],
-            rowMaxHeightPxs[index + 1]
-          );
+          const totalHeight = clone[index - 1] + clone[index];
+          const bottomHeight = limit(clone[index] - dy, min, max);
 
-          clone[index] = totalHeight - bottomHeight;
-          clone[index + 1] = bottomHeight;
+          clone[index - 1] = totalHeight - bottomHeight;
+          clone[index] = bottomHeight;
 
           return clone;
         });
@@ -141,11 +139,7 @@ const PaneSystem = ({
           const clone = [...prev];
 
           const totalHeight = clone[index] + clone[index + 1];
-          const topHeight = limit(
-            clone[index] + dy,
-            rowMinHeightPxs[index],
-            rowMaxHeightPxs[index]
-          );
+          const topHeight = limit(clone[index] + dy, min, max);
 
           clone[index] = topHeight;
           clone[index + 1] = totalHeight - topHeight;
@@ -166,10 +160,13 @@ const PaneSystem = ({
         {
           key: index,
           index,
+          totalRows: paneRows.length,
           containerWidth: containerSize.width,
           top,
           height: rowHeightPxs[index],
           splitter: row.props.splitter,
+          splitterHeight: row.props.splitterHeight,
+          splitterColor: row.props.splitterColor,
           onSplitterDrag: onRowSplitterDrag(index),
           bgColor: row.props.bgColor ?? bgColor,
           borderWidth: row.props.borderWidth ?? borderWidth,

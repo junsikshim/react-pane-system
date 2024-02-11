@@ -4,6 +4,9 @@ export const sizeToPixels = (size: string | number, relativeTo?: number) => {
 
   const [number, unit] = size.split(/(\d+)/).filter(Boolean);
 
+  // If there's no unit, return the number as is.
+  if (!unit) return +number;
+
   const parsedNumber = parseFloat(number);
   const parsedUnit = unit.trim();
 

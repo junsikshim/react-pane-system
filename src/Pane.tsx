@@ -9,6 +9,8 @@ export interface PaneProps extends PropsWithChildren {
   minWidth?: string;
   maxWidth?: string;
   splitter?: 'left' | 'right';
+  splitterWidth?: number;
+  splitterColor?: string;
   bgColor?: string;
   borderWidth?: number;
   borderColor?: string;
@@ -19,9 +21,13 @@ const Pane = ({ children }: PaneProps) => children;
 export default Pane;
 
 export interface InnerPaneProps {
+  index: number;
+  totalPanes: number;
   left: number;
   width: number;
   splitter?: 'left' | 'right';
+  splitterWidth?: number;
+  splitterColor?: string;
   onSplitterDrag?: (dx: number) => void;
   bgColor?: string;
   borderWidth?: number;
@@ -29,9 +35,13 @@ export interface InnerPaneProps {
 }
 
 export const InnerPane = ({
+  index,
+  totalPanes,
   left,
   width,
   splitter,
+  splitterWidth,
+  splitterColor,
   onSplitterDrag,
   bgColor,
   borderWidth,
@@ -40,35 +50,55 @@ export const InnerPane = ({
 }: PropsWithChildren<InnerPaneProps>) => {
   return (
     <div
-      className="pane"
       style={{
+        position: 'absolute',
         left: `${left}px`,
         width: `${width}px`,
-        position: 'absolute',
-        height: '100%',
-        backgroundColor: bgColor
+        height: '100%'
       }}
     >
-      {/* Border on the right side of the pane */}
-      <div
-        style={{
-          position: 'absolute',
-          top: 0,
-          right: `${borderWidth}px`,
-          width: `${borderWidth}px`,
-          height: '100%',
-          backgroundColor: borderColor
-        }}
-      />
-
       {splitter === 'left' && onSplitterDrag && (
-        <ColumnSplitter offsetLeft={0} onDrag={onSplitterDrag} />
+        <ColumnSplitter
+          offsetLeft={0}
+          onDrag={onSplitterDrag}
+          width={splitterWidth}
+          color={splitterColor}
+        />
       )}
+      <div
+        className="pane"
+        style={{
+          left: 0,
+          width: `${width}px`,
+          position: 'absolute',
+          height: '100%',
+          backgroundColor: bgColor,
+          overflow: 'hidden'
+        }}
+      >
+        {/* Border on the right side of the pane */}
+        {index !== totalPanes - 1 && (
+          <div
+            style={{
+              position: 'absolute',
+              top: 0,
+              right: 0,
+              width: `${borderWidth}px`,
+              height: '100%',
+              backgroundColor: borderColor
+            }}
+          />
+        )}
 
-      {children}
-
+        {children}
+      </div>
       {splitter === 'right' && onSplitterDrag && (
-        <ColumnSplitter offsetLeft={width} onDrag={onSplitterDrag} />
+        <ColumnSplitter
+          offsetLeft={width}
+          onDrag={onSplitterDrag}
+          width={splitterWidth}
+          color={splitterColor}
+        />
       )}
     </div>
   );

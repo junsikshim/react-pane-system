@@ -1,11 +1,10 @@
 import type { Meta, StoryObj } from '@storybook/react';
-import { within, userEvent, expect } from '@storybook/test';
 
-import { TwoRows } from './TwoRows';
+import { TopRow } from './TopRow';
 
 const meta = {
-  title: 'React Pane System/Two Rows',
-  component: TwoRows,
+  title: 'Two Rows/Top Row',
+  component: TopRow,
   parameters: {
     layout: 'centered'
   },
@@ -14,9 +13,11 @@ const meta = {
     systemHeight: { control: 'text' },
     topRowHeight: { control: 'text' },
     topRowMinHeight: { control: 'text' },
-    topRowMaxHeight: { control: 'text' }
+    topRowMaxHeight: { control: 'text' },
+    splitterHeight: { control: 'number' },
+    splitterColor: { control: 'color' }
   }
-} satisfies Meta<typeof TwoRows>;
+} satisfies Meta<typeof TopRow>;
 
 export default meta;
 type Story = StoryObj<typeof meta>;
@@ -34,6 +35,8 @@ export const WithSplitters: Story = {
     systemHeight: '400px',
     topRowHeight: '30%',
     topRowMinHeight: '50px',
-    topRowMaxHeight: '80%'
+    topRowMaxHeight: '80%',
+    splitterHeight: 4,
+    splitterColor: '#fff'
   }
 };

@@ -6,6 +6,8 @@ import { useEffect, useRef } from 'react';
 interface RowSplitterProps {
   offsetTop: number;
   onDrag: (dy: number) => void;
+  height?: number;
+  color?: string;
 }
 
 type DragState = {
@@ -13,7 +15,12 @@ type DragState = {
   currentY: number;
 };
 
-const RowSplitter = ({ offsetTop, onDrag }: RowSplitterProps) => {
+const RowSplitter = ({
+  offsetTop,
+  onDrag,
+  height = 4,
+  color = '#fff'
+}: RowSplitterProps) => {
   const ref = useRef<HTMLDivElement>(null);
   const dragState = useRef<DragState | null>(null);
   const { isHover, onPointerEnter, onPointerLeave } = useDelayedHover();
@@ -50,6 +57,9 @@ const RowSplitter = ({ offsetTop, onDrag }: RowSplitterProps) => {
         splitter.releasePointerCapture(e.pointerId);
 
         dragState.current = null;
+
+        window.removeEventListener('pointermove', onPointerMove);
+        window.removeEventListener('pointerup', onPointerUp);
       };
 
       window.addEventListener('pointermove', onPointerMove);
@@ -70,13 +80,13 @@ const RowSplitter = ({ offsetTop, onDrag }: RowSplitterProps) => {
       style={{
         position: 'absolute',
         width: '100%',
-        height: '4px',
+        height: `${height}px`,
         left: 0,
-        background: isHover ? '#d4d4d4' : 'transparent',
+        background: isHover ? color : 'transparent',
         cursor: 'row-resize',
         zIndex: 10,
         transition: 'background-color 0.2s',
-        transform: `translateY(${offsetTop - 3}px)`
+        transform: `translateY(${offsetTop - height / 2}px)`
       }}
       onPointerEnter={onPointerEnter}
       onPointerLeave={onPointerLeave}

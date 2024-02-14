@@ -16,3 +16,5 @@ jobs:
         uses: bitovi/github-actions-storybook-to-github-pages@v1.0.2
         with:
           path: build # change to your build folder
+          install_command: pnpm install --frozen-lockfile
+          build_command: pnpm run build-storybook

@@ -1,5 +1,11 @@
 # react-pane-system
 
+## 0.2.5
+
+### Patch Changes
+
+- 59eca9f: Add readme.
+
 ## 0.2.4
 
 ### Patch Changes

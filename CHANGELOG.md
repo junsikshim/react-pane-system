@@ -1,5 +1,12 @@
 # react-pane-system
 
+## 0.2.4
+
+### Patch Changes
+
+- fd40044: Add storybook action.
+- 17133c3: Add Storybook action.
+
 ## 0.2.3
 
 ### Patch Changes

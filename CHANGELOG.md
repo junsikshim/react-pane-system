@@ -1,5 +1,11 @@
 # react-pane-system
 
+## 0.2.3
+
+### Patch Changes
+
+- 8ccae40: Add Complex Panes story.
+
 ## 0.2.2
 
 ### Patch Changes

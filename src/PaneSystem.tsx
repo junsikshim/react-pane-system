@@ -93,6 +93,9 @@ const PaneSystem = ({
   useEffect(() => {
     if (containerSize.height === 0) return;
 
+    // Return if the row heights have already been calculated.
+    if (rowHeightPxs.length > 0) return;
+
     const nonAutoHeights = rowHeights.filter((h) => h !== 'auto');
     const autoHeights = rowHeights.filter((h) => h === 'auto');
 

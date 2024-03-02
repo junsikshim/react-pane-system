@@ -6,7 +6,7 @@ import {
   ReactElement,
   createElement,
   useCallback,
-  useEffect,
+  useLayoutEffect,
   useMemo,
   useState
 } from 'react';
@@ -95,7 +95,7 @@ export const InnerPaneRow = ({
   }, [panes, containerWidth]);
 
   // Calculate the column widths in pixels.
-  useEffect(() => {
+  useLayoutEffect(() => {
     if (containerWidth === 0) return;
 
     const nonAutoWidths = paneWidths.filter((w) => w !== 'auto');

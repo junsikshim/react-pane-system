@@ -8,11 +8,12 @@ import {
   useMemo,
   ReactElement,
   useCallback,
-  useRef,
-  createElement
+  createElement,
+  useLayoutEffect
 } from 'react';
 import { PaneRowProps, InnerPaneRow } from './PaneRow';
 import { sizeToPixels, limit } from './utils';
+import useResizableRef from './useResizableRef';
 
 interface PaneSystemProps {
   width?: string;
@@ -35,12 +36,14 @@ const PaneSystem = ({
   borderColor = '#909090',
   children
 }: PropsWithChildren<PaneSystemProps>) => {
-  const ref = useRef<HTMLDivElement>(null);
-
   // Container size in pixels.
   const [containerSize, setContainerSize] = useState<Size>({
     width: 0,
     height: 0
+  });
+
+  const ref = useResizableRef<HTMLDivElement>((width, height) => {
+    setContainerSize({ width, height });
   });
 
   // Row heights in pixels.
@@ -77,20 +80,8 @@ const PaneSystem = ({
     });
   }, [paneRows, containerSize]);
 
-  // Calculate the container size.
-  useEffect(() => {
-    const resizeObserver = new ResizeObserver((e) => {
-      const { width, height } = e[0].contentRect;
-      setContainerSize({ width, height });
-    });
-
-    if (!ref.current) return;
-
-    resizeObserver.observe(ref.current);
-  }, []);
-
   // Calculate the row heights in pixels.
-  useEffect(() => {
+  useLayoutEffect(() => {
     if (containerSize.height === 0) return;
 
     // Return if the row heights have already been calculated.

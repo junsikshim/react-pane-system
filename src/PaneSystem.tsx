@@ -12,8 +12,9 @@ import {
   useLayoutEffect
 } from 'react';
 import { PaneRowProps, InnerPaneRow } from './PaneRow';
-import { sizeToPixels, limit } from './utils';
+import { sizeToPixels, limit, isPaneSystemComponent } from './utils';
 import useResizableRef from './useResizableRef';
+import SplitterLayer from './SplitterLayer';
 
 interface PaneSystemProps {
   width?: string;
@@ -27,6 +28,13 @@ export type Size = {
   width: number;
   height: number;
 };
+
+export const paneSystemComponentType = [
+  'PaneSystem',
+  'PaneRow',
+  'Pane'
+] as const;
+export type PaneSystemComponentType = (typeof paneSystemComponentType)[number];
 
 const PaneSystem = ({
   width: systemWidth = '100%',
@@ -55,6 +63,12 @@ const PaneSystem = ({
 
     if (array.length === 0)
       throw new Error('PaneSystem must have at least one PaneRow.');
+
+    const hasNonPaneRow = array.some(
+      (c) => !isPaneSystemComponent('PaneRow')(c)
+    );
+    if (hasNonPaneRow)
+      throw new Error('PaneSystem can only have PaneRow components.');
 
     return array as ReactElement<PaneRowProps>[];
   }, [children]);
@@ -182,6 +196,8 @@ const PaneSystem = ({
       style={{ width: systemWidth, height: systemHeight, position: 'relative' }}
     >
       {rows}
+
+      <SplitterLayer />
     </div>
   );
 };

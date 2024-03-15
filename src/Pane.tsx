@@ -17,6 +17,7 @@ export interface PaneProps extends PropsWithChildren {
 }
 
 const Pane = ({ children }: PaneProps) => children;
+Pane.displayName = 'Pane';
 
 export default Pane;
 

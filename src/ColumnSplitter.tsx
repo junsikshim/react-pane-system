@@ -32,8 +32,8 @@ const ColumnSplitter = ({
 
     const onPointerDown = (e: PointerEvent) => {
       if (!splitter) return;
-
-      splitter.setPointerCapture(e.pointerId);
+      console.log('col');
+      // splitter.setPointerCapture(e.pointerId);
 
       dragState.current = {
         startX: e.clientX,

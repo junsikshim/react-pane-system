@@ -32,8 +32,8 @@ const RowSplitter = ({
 
     const onPointerDown = (e: PointerEvent) => {
       if (!splitter) return;
-
-      splitter.setPointerCapture(e.pointerId);
+      console.log('row');
+      // splitter.setPointerCapture(e.pointerId);
 
       dragState.current = {
         startY: e.clientY,

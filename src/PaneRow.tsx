@@ -5,14 +5,18 @@ import {
   PropsWithChildren,
   ReactElement,
   createElement,
+  isValidElement,
   useCallback,
+  useContext,
+  useEffect,
   useLayoutEffect,
   useMemo,
+  useRef,
   useState
 } from 'react';
 import { InnerPane, PaneProps } from './Pane';
-import { sizeToPixels, limit } from './utils';
-import RowSplitter from './RowSplitter';
+import { sizeToPixels, limit, isPaneSystemComponent, createId } from './utils';
+import { PaneSystemContext } from './PaneSystemContext';
 
 export interface PaneRowProps extends PropsWithChildren {
   height?: string;
@@ -27,6 +31,7 @@ export interface PaneRowProps extends PropsWithChildren {
 }
 
 const PaneRow = ({ children }: PaneRowProps) => children;
+PaneRow.displayName = 'PaneRow';
 
 export default PaneRow;
 
@@ -60,6 +65,9 @@ export const InnerPaneRow = ({
   borderColor,
   children
 }: PropsWithChildren<InnerPaneRowProps>) => {
+  const ref = useRef<HTMLDivElement>(null);
+  const { addSplitter, removeSplitter } = useContext(PaneSystemContext);
+
   // The widths of the Pane components in pixels.
   const [paneWidthPxs, setPaneWidthPxs] = useState<number[]>([]);
 
@@ -69,6 +77,9 @@ export const InnerPaneRow = ({
 
     if (array.length === 0)
       throw new Error('PaneRow must have at least one Pane.');
+
+    const hasNonPane = array.some((c) => !isPaneSystemComponent('Pane')(c));
+    if (hasNonPane) throw new Error('PaneRow can only have Pane components.');
 
     return array as ReactElement<PaneProps>[];
   }, [children]);
@@ -186,8 +197,56 @@ export const InnerPaneRow = ({
     });
   }, [panes, paneWidthPxs, onPaneSplitterDrag]);
 
+  useEffect(() => {
+    const id = createId();
+
+    if (splitter === 'top' || splitter === 'bottom') {
+      if (!ref.current) return;
+
+      const rect = ref.current.getBoundingClientRect();
+      const x = rect.x;
+      const y = rect.y + (splitter === 'top' ? 0 : rect.height);
+      const width = containerWidth;
+      const height = splitterHeight ?? 4;
+      const color = splitterColor ?? 'rgba(0, 0, 0, 0.2)';
+      const boundMinX = x;
+      const boundMaxX = x + width;
+      const boundMinY = rect.y;
+      const boundMaxY = rect.y + rect.height;
+
+      addSplitter({
+        id,
+        orientation: 'horizontal',
+        x,
+        y,
+        width,
+        height,
+        color,
+        bounds: {
+          minX: boundMinX,
+          minY: boundMinY,
+          maxX: boundMaxX,
+          maxY: boundMaxY
+        }
+      });
+    }
+
+    return () => {
+      removeSplitter(id);
+    };
+  }, [
+    splitter,
+    splitterHeight,
+    splitterColor,
+    top,
+    containerWidth,
+    addSplitter,
+    removeSplitter
+  ]);
+
   return (
     <div
+      ref={ref}
       className="pane-row"
       style={{
         top: `${top}px`,
@@ -211,25 +270,25 @@ export const InnerPaneRow = ({
         />
       )}
 
-      {splitter === 'top' && onSplitterDrag && (
+      {/* {splitter === 'top' && onSplitterDrag && (
         <RowSplitter
           offsetTop={0}
           onDrag={onSplitterDrag}
           height={splitterHeight}
           color={splitterColor}
         />
-      )}
+      )} */}
 
       {cols}
 
-      {splitter === 'bottom' && onSplitterDrag && (
+      {/* {splitter === 'bottom' && onSplitterDrag && (
         <RowSplitter
           offsetTop={height}
           onDrag={onSplitterDrag}
           height={splitterHeight}
           color={splitterColor}
         />
-      )}
+      )} */}
     </div>
   );
 };

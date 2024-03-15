@@ -1,5 +1,11 @@
 # react-pane-system
 
+## 0.2.6
+
+### Patch Changes
+
+- 6790c25: Update package.json.
+
 ## 0.2.5
 
 ### Patch Changes

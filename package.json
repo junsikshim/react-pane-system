@@ -1,6 +1,6 @@
 {
   "name": "react-pane-system",
-  "version": "0.2.5",
+  "version": "0.2.6",
   "description": "A declarative, flexible pane layout system for React projects.",
   "author": "Junsik Shim <junsik.shim@gmail.com>",
   "license": "MIT",

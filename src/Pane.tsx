@@ -2,7 +2,7 @@
 
 import { PropsWithChildren, ReactNode, createElement, useMemo } from 'react';
 import ColumnSplitter from './ColumnSplitter';
-import PaneSystem, { InnerPaneSystem } from './PaneSystem';
+import { InnerPaneSystem } from './PaneSystem';
 
 export interface PaneProps extends PropsWithChildren {
   id: string;
@@ -15,7 +15,6 @@ export interface PaneProps extends PropsWithChildren {
   bgColor?: string;
   borderWidth?: number;
   borderColor?: string;
-  onSizeChange?: (width: number) => void;
 }
 
 const Pane = ({ children }: PaneProps) => children;
@@ -57,8 +56,8 @@ export const InnerPane = ({
     if (typeof _children === 'boolean') return _children;
     if (isIterableReactNode(_children)) return _children;
 
-    // @ts-ignore
-    if (_children.type.displayName === 'PaneSystem') {
+    // TODO: Inference displayName from the component
+    if ((_children.type as any).displayName === 'PaneSystem') {
       return createElement(InnerPaneSystem, {
         ...(_children.props || {}),
         parentContainerSize: { width: width }

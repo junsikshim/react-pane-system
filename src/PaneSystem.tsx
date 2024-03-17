@@ -366,11 +366,7 @@ export const InnerPaneSystem = ({
     <div
       ref={ref}
       className="pane-system"
-      style={{
-        width: systemWidth,
-        height: systemHeight,
-        position: 'relative'
-      }}
+      style={{ width: systemWidth, height: systemHeight, position: 'relative' }}
     >
       {rows}
     </div>

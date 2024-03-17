@@ -55,7 +55,11 @@ export const InnerPane = ({
   children: _children
 }: PropsWithChildren<InnerPaneProps>) => {
   const children = useMemo(() => {
-    if (!isValidElement(_children) || typeof _children.type === 'string')
+    if (
+      !isValidElement(_children) ||
+      typeof _children.type === 'string' ||
+      typeof _children.type === 'symbol'
+    )
       return _children;
 
     if (

@@ -59,7 +59,7 @@ export const InnerPane = ({
     // TODO: Inference displayName from the component
     if ((_children.type as any).displayName === 'PaneSystem') {
       return createElement(InnerPaneSystem, {
-        ...(_children.props || {}),
+        ...(_children.props ?? {}),
         parentContainerSize: { width: width }
       });
     }

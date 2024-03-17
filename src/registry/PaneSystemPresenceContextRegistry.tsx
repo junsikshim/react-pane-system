@@ -1,6 +1,6 @@
 import { ReactNode, createContext, useContext, useEffect } from 'react';
 
-export const PaneSystemPresenceContext = createContext<boolean>(false);
+const PaneSystemPresenceContext = createContext<boolean>(false);
 
 const PaneSystemContextRegistry = ({ children }: { children: ReactNode }) => {
   const paneSystemPresence = useContext(PaneSystemPresenceContext);

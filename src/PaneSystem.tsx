@@ -14,6 +14,9 @@ import {
 import { PaneRowProps, InnerPaneRow } from './PaneRow';
 import { sizeToPixels, limit } from './utils';
 import useResizableRef from './useResizableRef';
+import PaneSystemContextRegistry, {
+  useNestedPaneSystemChecker
+} from './registry/PaneSystemPresenceContextRegistry';
 
 interface PaneSystemProps extends PropsWithChildren {
   width?: string;
@@ -45,6 +48,8 @@ const PaneSystem = ({
   const ref = useResizableRef<HTMLDivElement>((width, height) => {
     setContainerSize({ width, height });
   });
+
+  useNestedPaneSystemChecker();
 
   // Row heights in pixels.
   const [rowHeightPxs, setRowHeightPxs] = useState<number[]>([]);
@@ -176,13 +181,19 @@ const PaneSystem = ({
   }, [paneRows, rowHeightPxs, containerSize.width, onRowSplitterDrag]);
 
   return (
-    <div
-      ref={ref}
-      className="pane-system"
-      style={{ width: systemWidth, height: systemHeight, position: 'relative' }}
-    >
-      {rows}
-    </div>
+    <PaneSystemContextRegistry>
+      <div
+        ref={ref}
+        className="pane-system"
+        style={{
+          width: systemWidth,
+          height: systemHeight,
+          position: 'relative'
+        }}
+      >
+        {rows}
+      </div>
+    </PaneSystemContextRegistry>
   );
 };
 
@@ -355,7 +366,11 @@ export const InnerPaneSystem = ({
     <div
       ref={ref}
       className="pane-system"
-      style={{ width: systemWidth, height: systemHeight, position: 'relative' }}
+      style={{
+        width: systemWidth,
+        height: systemHeight,
+        position: 'relative'
+      }}
     >
       {rows}
     </div>

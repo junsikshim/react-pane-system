@@ -1,6 +1,11 @@
 'use client';
 
-import { PropsWithChildren, ReactNode, createElement, useMemo } from 'react';
+import {
+  PropsWithChildren,
+  createElement,
+  isValidElement,
+  useMemo
+} from 'react';
 import ColumnSplitter from './ColumnSplitter';
 import { InnerPaneSystem } from './PaneSystem';
 
@@ -50,17 +55,16 @@ export const InnerPane = ({
   children: _children
 }: PropsWithChildren<InnerPaneProps>) => {
   const children = useMemo(() => {
-    if (!_children) return _children;
-    if (typeof _children === 'string') return _children;
-    if (typeof _children === 'number') return _children;
-    if (typeof _children === 'boolean') return _children;
-    if (isIterableReactNode(_children)) return _children;
+    if (!isValidElement(_children) || typeof _children.type === 'string')
+      return _children;
 
-    // TODO: Inference displayName from the component
-    if ((_children.type as any).displayName === 'PaneSystem') {
+    if (
+      'displayName' in _children.type &&
+      _children.type.displayName === 'PaneSystem'
+    ) {
       return createElement(InnerPaneSystem, {
         ...(_children.props ?? {}),
-        parentContainerSize: { width: width }
+        parentContainerSize: { width }
       });
     }
 
@@ -122,9 +126,3 @@ export const InnerPane = ({
     </div>
   );
 };
-
-function isIterableReactNode(
-  children: ReactNode | ReactNode[]
-): children is Iterable<ReactNode> {
-  return Symbol.iterator in Object(children);
-}

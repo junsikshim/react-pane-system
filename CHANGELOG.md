@@ -1,5 +1,11 @@
 # react-pane-system
 
+## 0.2.7
+
+### Patch Changes
+
+- 7de7d8f: Fix slow expansion issue.
+
 ## 0.2.6
 
 ### Patch Changes

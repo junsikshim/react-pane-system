@@ -25,7 +25,7 @@ export const useNestedPaneSystemChecker = () => {
   useEffect(() => {
     if (paneSystemPresence) {
       console.warn(
-        'Warning: <PaneSystem /> recommends being directly nested with only a single child component, <Pane />. Otherwise, unexpected side effects may occur.'
+        "Warning: <PaneSystem /> isn't the only direct child of <Pane />. Unexpected side effects may occur."
       );
     }
   }, []);

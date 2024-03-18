@@ -1,7 +1,13 @@
 'use client';
 
-import { PropsWithChildren } from 'react';
+import {
+  PropsWithChildren,
+  createElement,
+  isValidElement,
+  useMemo
+} from 'react';
 import ColumnSplitter from './ColumnSplitter';
+import { InnerPaneSystem } from './PaneSystem';
 
 export interface PaneProps extends PropsWithChildren {
   id: string;
@@ -46,8 +52,29 @@ export const InnerPane = ({
   bgColor,
   borderWidth,
   borderColor,
-  children
+  children: _children
 }: PropsWithChildren<InnerPaneProps>) => {
+  const children = useMemo(() => {
+    if (
+      !isValidElement(_children) ||
+      typeof _children.type === 'string' ||
+      typeof _children.type === 'symbol'
+    )
+      return _children;
+
+    if (
+      'displayName' in _children.type &&
+      _children.type.displayName === 'PaneSystem'
+    ) {
+      return createElement(InnerPaneSystem, {
+        ...(_children.props ?? {}),
+        parentContainerSize: { width }
+      });
+    }
+
+    return _children;
+  }, [_children, width]);
+
   return (
     <div
       style={{

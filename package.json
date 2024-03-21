@@ -1,7 +1,13 @@
 {
   "name": "react-pane-system",
-  "version": "0.2.5",
-  "description": "",
+  "version": "0.2.6",
+  "description": "A declarative, flexible pane layout system for React projects.",
+  "author": "Junsik Shim <junsik.shim@gmail.com>",
+  "license": "MIT",
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/junsikshim/react-pane-system.git"
+  },
   "private": false,
   "main": "./dist/index.js",
   "module": "./dist/index.mjs",
@@ -16,9 +22,6 @@
     "storybook": "storybook dev -p 6006",
     "build-storybook": "storybook build"
   },
-  "keywords": [],
-  "author": "",
-  "license": "MIT",
   "devDependencies": {
     "@changesets/cli": "^2.27.1",
     "@storybook/addon-essentials": "^7.6.13",
@@ -40,6 +43,7 @@
     "vitest": "^1.2.2"
   },
   "peerDependencies": {
-    "react": "^18.0.0"
+    "react": "^18.0.0",
+    "react-dom": "^18.2.0"
   }
 }

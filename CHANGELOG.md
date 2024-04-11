@@ -1,5 +1,11 @@
 # react-pane-system
 
+## 0.2.8
+
+### Patch Changes
+
+- a87bf19: Reduce paneSystem logic duplication.
+
 ## 0.2.7
 
 ### Patch Changes

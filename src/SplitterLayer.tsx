@@ -1,11 +1,12 @@
 import { useContext } from 'react';
-import { PaneSystemContext } from './PaneSystemContext';
+import { SplitterRegistry } from './registry/SplitterRegistry';
 
 const SplitterLayer = () => {
-  const { splitters } = useContext(PaneSystemContext);
+  const { splitters } = useContext(SplitterRegistry);
   console.log('splitters', splitters);
   return (
     <div
+      className="splitters"
       style={{
         position: 'absolute',
         left: 0,

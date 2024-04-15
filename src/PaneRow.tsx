@@ -6,13 +6,13 @@ import {
   ReactElement,
   createElement,
   useCallback,
-  useLayoutEffect,
   useMemo,
   useState
 } from 'react';
 import { InnerPane, PaneProps } from './Pane';
 import { sizeToPixels, limit } from './utils';
 import RowSplitter from './RowSplitter';
+import useIsomorphicLayoutEffect from './hooks/useIsomorphicLayoutEffect';
 
 export interface PaneRowProps extends PropsWithChildren {
   height?: string;
@@ -95,7 +95,7 @@ export const InnerPaneRow = ({
   }, [panes, containerWidth]);
 
   // Calculate the column widths in pixels.
-  useLayoutEffect(() => {
+  useIsomorphicLayoutEffect(() => {
     if (containerWidth === 0) return;
 
     const nonAutoWidths = paneWidths.filter((w) => w !== 'auto');

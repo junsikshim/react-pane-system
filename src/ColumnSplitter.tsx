@@ -1,6 +1,6 @@
 'use client';
 
-import useDelayedHover from './useDelayedHover';
+import useDelayedHover from './hooks/useDelayedHover';
 import { useEffect, useRef } from 'react';
 
 interface ColumnSplitterProps {

@@ -46,3 +46,8 @@ export const isPaneSystemComponent =
 export const createId = () => {
   return Math.random().toString(36).substring(2, 9);
 };
+
+// Check if the given values are approximately equal.
+export const isEqual = (a: number, b: number, epsilon = 1) => {
+  return Math.abs(a - b) < epsilon;
+};

@@ -12,39 +12,33 @@ import {
   useLayoutEffect,
   createContext,
   useContext,
-  Dispatch
+  Dispatch,
+  useRef
 } from 'react';
 import { PaneRowProps, InnerPaneRow } from './PaneRow';
-import { sizeToPixels, limit, isPaneSystemComponent } from './utils';
+import { sizeToPixels, limit, createId } from './utils';
 import useResizableRef from './useResizableRef';
 import SplitterLayer from './SplitterLayer';
 import PaneSystemContextRegistry, {
   useNestedPaneSystemChecker
 } from './registry/PaneSystemPresenceContextRegistry';
 import {
-  PaneSystemContext,
-  PaneSystemContextProvider
-} from './PaneSystemContext';
-import { SplitterRegistryProvider } from './registry/SplitterRegistry';
+  SplitterRegistry,
+  SplitterRegistryProvider
+} from './splitter/SplitterRegistry';
+import { Size } from './types';
+import {
+  PaneSystemRectContext,
+  PaneSystemRectContextProvider
+} from './registry/PaneSystemRectContext';
 
-export type Size = {
-  width: number;
-  height: number;
-};
-
-export type Rect = {
-  left: number;
-  top: number;
-  width: number;
-  height: number;
-};
-
-const ContainerRectContext = createContext<[Rect, Dispatch<Rect>]>([
-  { left: 0, top: 0, width: 0, height: 0 },
+const ContainerSizeContext = createContext<[Size, Dispatch<Size>]>([
+  { width: 0, height: 0 },
   () => {}
 ]);
 
 interface CorePaneSystemProps extends PropsWithChildren {
+  isRoot?: boolean;
   width?: string;
   height?: string;
   bgColor?: string;
@@ -60,6 +54,7 @@ export const paneSystemComponentType = [
 export type PaneSystemComponentType = (typeof paneSystemComponentType)[number];
 
 const CorePaneSystem = ({
+  isRoot = false,
   width: systemWidth = '100%',
   height: systemHeight = '100%',
   bgColor = '#4b5563',
@@ -68,25 +63,26 @@ const CorePaneSystem = ({
   children
 }: PropsWithChildren<CorePaneSystemProps>) => {
   // Container size in pixels.
-  const [containerRect, setContainerRect] = useContext(ContainerRectContext);
+  const [containerSize, setContainerSize] = useContext(ContainerSizeContext);
+
+  const [containerRect, setContainerRect] = useContext(PaneSystemRectContext);
 
   const [ref, setRef] = useResizableRef<HTMLDivElement>((width, height) => {
     if (!ref.current) return;
 
+    // Set the container size.
+    setContainerSize({ width, height });
+
+    if (!isRoot) return;
+
+    // Set the container rect if this is the top-level PaneSystem.
     const rect = ref.current.getBoundingClientRect();
-    console.log('rect', rect);
     setContainerRect(rect);
   });
 
-  // useEffect(() => {
-  //   if (!ref.current) return;
+  const splitterIds = useRef<string[]>([]);
 
-  //   const rect = ref.current.getBoundingClientRect();
-  //   setContainerRect(rect);
-  //   console.log('rect', rect);
-  // }, []);
-
-  useNestedPaneSystemChecker();
+  const { addSplitter, removeSplitter } = useContext(SplitterRegistry);
 
   // Row heights in pixels.
   const [rowHeightPxs, setRowHeightPxs] = useState<number[]>([]);
@@ -110,21 +106,21 @@ const CorePaneSystem = ({
   const rowMinHeightPxs = useMemo<number[]>(() => {
     return paneRows.map((r) => {
       const minHeight = r.props.minHeight ?? 0;
-      return sizeToPixels(minHeight, containerRect.height);
+      return sizeToPixels(minHeight, containerSize.height);
     });
-  }, [paneRows, containerRect]);
+  }, [paneRows, containerSize]);
 
   // Calculate the row max heights in pixels.
   const rowMaxHeightPxs = useMemo<number[]>(() => {
     return paneRows.map((r) => {
       const maxHeight = r.props.maxHeight ?? '100%';
-      return sizeToPixels(maxHeight, containerRect.height);
+      return sizeToPixels(maxHeight, containerSize.height);
     });
-  }, [paneRows, containerRect]);
+  }, [paneRows, containerSize]);
 
   // Calculate the row heights in pixels.
   useLayoutEffect(() => {
-    if (containerRect.height === 0) return;
+    if (containerSize.height === 0) return;
 
     // Return if the row heights have already been calculated.
     if (rowHeightPxs.length > 0) return;
@@ -137,17 +133,44 @@ const CorePaneSystem = ({
     }
 
     const nonAutoHeightPxs = nonAutoHeights.map((h) =>
-      sizeToPixels(h, containerRect.height)
+      sizeToPixels(h, containerSize.height)
     );
     const autoHeightPx =
-      containerRect.height - nonAutoHeightPxs.reduce((a, b) => a + b, 0);
+      containerSize.height - nonAutoHeightPxs.reduce((a, b) => a + b, 0);
     const autoHeightIndex = rowHeights.findIndex((h) => h === 'auto');
 
     if (autoHeightIndex !== -1)
       nonAutoHeightPxs.splice(autoHeightIndex, 0, autoHeightPx);
 
     setRowHeightPxs(nonAutoHeightPxs);
-  }, [containerRect, rowHeights]);
+  }, [containerSize, rowHeights]);
+
+  const rows = useMemo(() => {
+    let top = 0;
+
+    return paneRows.map((row, index) => {
+      const r = createElement(
+        InnerPaneRow,
+        {
+          key: index,
+          index,
+          totalRows: paneRows.length,
+          containerWidth: containerSize.width,
+          containerHeight: containerSize.height,
+          top,
+          height: rowHeightPxs[index],
+          bgColor: row.props.bgColor ?? bgColor,
+          borderWidth: row.props.borderWidth ?? borderWidth,
+          borderColor: row.props.borderColor ?? borderColor
+        },
+        row.props.children
+      );
+
+      top += rowHeightPxs[index];
+
+      return r;
+    });
+  }, [paneRows, rowHeightPxs, containerSize.width]);
 
   // Drag handler for the row splitter.
   const onRowSplitterDrag = useCallback(
@@ -187,39 +210,74 @@ const CorePaneSystem = ({
     [setRowHeightPxs, rowHeights, rowMinHeightPxs, rowMaxHeightPxs]
   );
 
-  const rows = useMemo(() => {
+  useEffect(() => {
+    if (!ref.current) return;
+
+    const rect = ref.current.getBoundingClientRect();
     let top = 0;
 
-    return paneRows.map((row, index) => {
-      const r = createElement(
-        InnerPaneRow,
-        {
-          key: index,
-          index,
-          totalRows: paneRows.length,
-          containerWidth: containerRect.width,
-          top,
-          height: rowHeightPxs[index],
-          splitter: row.props.splitter,
-          splitterHeight: row.props.splitterHeight,
-          splitterColor: row.props.splitterColor,
-          onSplitterDrag: onRowSplitterDrag(index),
-          bgColor: row.props.bgColor ?? bgColor,
-          borderWidth: row.props.borderWidth ?? borderWidth,
-          borderColor: row.props.borderColor ?? borderColor
-        },
-        row.props.children
-      );
-
+    paneRows.forEach((row, index) => {
       top += rowHeightPxs[index];
 
-      return r;
+      // Add a splitter if the row has a splitter.
+      if (row.props.splitter === 'top' || row.props.splitter === 'bottom') {
+        const x = rect.x - containerRect.left;
+        const y =
+          rect.y +
+          top +
+          (row.props.splitter === 'top' ? -rowHeightPxs[index] : 0) -
+          containerRect.top;
+        const sWidth = containerSize.width;
+        const sHeight = row.props.splitterHeight ?? 4;
+        const color = row.props.splitterColor ?? 'rgba(0, 0, 0, 0.2)';
+        const boundMinX = x;
+        const boundMaxX = x + sWidth;
+        const boundMinY = rect.y;
+        const boundMaxY = rect.y + rowHeightPxs[index];
+
+        // Return if the positions are invalid.
+        if (Number.isNaN(x) || Number.isNaN(y)) return;
+
+        let id = splitterIds.current[index];
+
+        // Keep track of the splitter IDs.
+        if (!id) {
+          id = createId();
+          splitterIds.current[index] = id;
+        }
+
+        addSplitter({
+          id,
+          orientation: 'horizontal',
+          x,
+          y,
+          width: sWidth,
+          height: sHeight,
+          color,
+          bounds: {
+            minX: boundMinX,
+            minY: boundMinY,
+            maxX: boundMaxX,
+            maxY: boundMaxY
+          },
+          onDrag: onRowSplitterDrag(index)
+        });
+      }
     });
-  }, [paneRows, rowHeightPxs, containerRect.width, onRowSplitterDrag]);
+  }, [
+    paneRows,
+    containerRect,
+    containerSize,
+    rowHeightPxs,
+    addSplitter,
+    removeSplitter,
+    onRowSplitterDrag,
+    createId
+  ]);
 
   return (
     <div
-      ref={ref}
+      ref={setRef}
       className="pane-system"
       style={{
         width: systemWidth,
@@ -228,10 +286,12 @@ const CorePaneSystem = ({
       }}
     >
       {rows}
+      {isRoot && <SplitterLayer />}
     </div>
   );
 };
 
+// PaneSystem interface component.
 interface PaneSystemProps extends PropsWithChildren {
   width?: string;
   height?: string;
@@ -241,10 +301,8 @@ interface PaneSystemProps extends PropsWithChildren {
 }
 
 const PaneSystem = (props: PaneSystemProps) => {
-  // Container rect in pixels.
-  const [containerRect, setContainerRect] = useState<Rect>({
-    left: 0,
-    top: 0,
+  // Container size in pixels.
+  const [containerSize, setContainerSize] = useState<Size>({
     width: 0,
     height: 0
   });
@@ -253,9 +311,15 @@ const PaneSystem = (props: PaneSystemProps) => {
 
   return (
     <PaneSystemContextRegistry>
-      <ContainerRectContext.Provider value={[containerRect, setContainerRect]}>
-        <CorePaneSystem {...props} />
-      </ContainerRectContext.Provider>
+      <PaneSystemRectContextProvider>
+        <SplitterRegistryProvider>
+          <ContainerSizeContext.Provider
+            value={[containerSize, setContainerSize]}
+          >
+            <CorePaneSystem {...props} isRoot={true} />
+          </ContainerSizeContext.Provider>
+        </SplitterRegistryProvider>
+      </PaneSystemRectContextProvider>
     </PaneSystemContextRegistry>
   );
 };
@@ -268,6 +332,7 @@ type InnerPaneSystemProps = PaneSystemProps & {
   parentContainerSize?: Size;
 };
 
+// Internal PaneSystem component.
 export const InnerPaneSystem = ({
   parentContainerSize,
   ...props
@@ -277,26 +342,6 @@ export const InnerPaneSystem = ({
     width: 0,
     height: 0
   });
-
-  const containerRect = useMemo<Rect>(() => {
-    return {
-      left: 0,
-      top: 0,
-      width: containerSize.width,
-      height: containerSize.height
-    };
-  }, [containerSize]);
-
-  const setContainerRect = useCallback(
-    (rect: Rect) => {
-      setContainerSize((prev) => ({
-        ...prev,
-        width: rect.width,
-        height: rect.height
-      }));
-    },
-    [setContainerSize]
-  );
 
   useEffect(() => {
     if (!parentContainerSize) return;
@@ -308,8 +353,8 @@ export const InnerPaneSystem = ({
   }, [parentContainerSize]);
 
   return (
-    <ContainerRectContext.Provider value={[containerRect, setContainerRect]}>
+    <ContainerSizeContext.Provider value={[containerSize, setContainerSize]}>
       <CorePaneSystem {...props} />
-    </ContainerRectContext.Provider>
+    </ContainerSizeContext.Provider>
   );
 };

@@ -6,7 +6,6 @@ import {
   isValidElement,
   useMemo
 } from 'react';
-import ColumnSplitter from './ColumnSplitter';
 import { InnerPaneSystem } from './PaneSystem';
 
 export interface PaneProps extends PropsWithChildren {
@@ -32,10 +31,6 @@ export interface InnerPaneProps {
   totalPanes: number;
   left: number;
   width: number;
-  splitter?: 'left' | 'right';
-  splitterWidth?: number;
-  splitterColor?: string;
-  onSplitterDrag?: (dx: number) => void;
   bgColor?: string;
   borderWidth?: number;
   borderColor?: string;
@@ -46,10 +41,6 @@ export const InnerPane = ({
   totalPanes,
   left,
   width,
-  splitter,
-  splitterWidth,
-  splitterColor,
-  onSplitterDrag,
   bgColor,
   borderWidth,
   borderColor,
@@ -85,14 +76,6 @@ export const InnerPane = ({
         height: '100%'
       }}
     >
-      {splitter === 'left' && onSplitterDrag && (
-        <ColumnSplitter
-          offsetLeft={0}
-          onDrag={onSplitterDrag}
-          width={splitterWidth}
-          color={splitterColor}
-        />
-      )}
       <div
         className="pane"
         style={{
@@ -120,14 +103,6 @@ export const InnerPane = ({
 
         {children}
       </div>
-      {splitter === 'right' && onSplitterDrag && (
-        <ColumnSplitter
-          offsetLeft={width}
-          onDrag={onSplitterDrag}
-          width={splitterWidth}
-          color={splitterColor}
-        />
-      )}
     </div>
   );
 };

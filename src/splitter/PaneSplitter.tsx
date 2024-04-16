@@ -1,8 +1,8 @@
 'use client';
 
 import { Splitter, SplitterRegistry } from './SplitterRegistry';
-import useDelayedHover from '../useDelayedHover';
 import { useContext, useEffect, useRef } from 'react';
+import useDelayedHover from '../hooks/useDelayedHover';
 
 interface PaneSplitterProps {
   splitter: Splitter;

@@ -9,7 +9,6 @@ import {
   ReactElement,
   useCallback,
   createElement,
-  useLayoutEffect,
   createContext,
   useContext,
   Dispatch,
@@ -17,11 +16,7 @@ import {
 } from 'react';
 import { PaneRowProps, InnerPaneRow } from './PaneRow';
 import { sizeToPixels, limit, createId } from './utils';
-import useResizableRef from './useResizableRef';
 import SplitterLayer from './SplitterLayer';
-import PaneSystemContextRegistry, {
-  useNestedPaneSystemChecker
-} from './registry/PaneSystemPresenceContextRegistry';
 import {
   SplitterRegistry,
   SplitterRegistryProvider
@@ -31,6 +26,11 @@ import {
   PaneSystemRectContext,
   PaneSystemRectContextProvider
 } from './registry/PaneSystemRectContext';
+import useResizableRef from './hooks/useResizableRef';
+import PaneSystemContextRegistry, {
+  useNestedPaneSystemChecker
+} from './registry/PaneSystemPresenceContextRegistry';
+import useIsomorphicLayoutEffect from './hooks/useIsomorphicLayoutEffect';
 
 const ContainerSizeContext = createContext<[Size, Dispatch<Size>]>([
   { width: 0, height: 0 },
@@ -119,7 +119,7 @@ const CorePaneSystem = ({
   }, [paneRows, containerSize]);
 
   // Calculate the row heights in pixels.
-  useLayoutEffect(() => {
+  useIsomorphicLayoutEffect(() => {
     if (containerSize.height === 0) return;
 
     // Return if the row heights have already been calculated.

@@ -8,7 +8,6 @@ import {
   useCallback,
   useContext,
   useEffect,
-  useLayoutEffect,
   useMemo,
   useRef,
   useState
@@ -17,6 +16,7 @@ import { InnerPane, PaneProps } from './Pane';
 import { sizeToPixels, limit, createId } from './utils';
 import { SplitterRegistry } from './splitter/SplitterRegistry';
 import { PaneSystemRectContext } from './registry/PaneSystemRectContext';
+import useIsomorphicLayoutEffect from './hooks/useIsomorphicLayoutEffect';
 
 export interface PaneRowProps extends PropsWithChildren {
   height?: string;
@@ -100,7 +100,7 @@ export const InnerPaneRow = ({
   }, [panes, containerWidth]);
 
   // Calculate the column widths in pixels.
-  useLayoutEffect(() => {
+  useIsomorphicLayoutEffect(() => {
     if (containerWidth === 0) return;
 
     const nonAutoWidths = paneWidths.filter((w) => w !== 'auto');

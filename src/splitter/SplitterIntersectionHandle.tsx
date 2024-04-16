@@ -1,8 +1,8 @@
 'use client';
 
 import { SplitterIntersection, SplitterRegistry } from './SplitterRegistry';
-import useDelayedHover from '../useDelayedHover';
-import { useContext, useEffect, useRef, useState } from 'react';
+import useDelayedHover from '../hooks/useDelayedHover';
+import { useContext, useEffect, useRef } from 'react';
 
 interface SplitterIntersectionHandleProps {
   intersection: SplitterIntersection;
@@ -21,8 +21,7 @@ const SplitterIntersectionHandle = ({
   const ref = useRef<HTMLDivElement>(null);
   const dragState = useRef<DragState | null>(null);
   const { isHover, onPointerEnter, onPointerLeave } = useDelayedHover();
-  const { currentSplitterIds, setCurrentSplitterIds } =
-    useContext(SplitterRegistry);
+  const { setCurrentSplitterIds } = useContext(SplitterRegistry);
   const {
     x: handleX,
     y: handleY,
@@ -93,6 +92,8 @@ const SplitterIntersectionHandle = ({
     };
   }, [splitter1, splitter2, setCurrentSplitterIds]);
 
+  // Adjust hover state.
+  // TODO - Need to keep hover state while dragging.
   useEffect(() => {
     if (isHover) setCurrentSplitterIds([splitter1.id, splitter2.id]);
     else if (!dragState.current) setCurrentSplitterIds([]);

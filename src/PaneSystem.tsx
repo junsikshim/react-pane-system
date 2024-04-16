@@ -9,17 +9,17 @@ import {
   ReactElement,
   useCallback,
   createElement,
-  useLayoutEffect,
   createContext,
   useContext,
   Dispatch
 } from 'react';
 import { PaneRowProps, InnerPaneRow } from './PaneRow';
 import { sizeToPixels, limit } from './utils';
-import useResizableRef from './useResizableRef';
+import useResizableRef from './hooks/useResizableRef';
 import PaneSystemContextRegistry, {
   useNestedPaneSystemChecker
 } from './registry/PaneSystemPresenceContextRegistry';
+import useIsomorphicLayoutEffect from './hooks/useIsomorphicLayoutEffect';
 
 export type Size = {
   width: number;
@@ -88,7 +88,7 @@ const CorePaneSystem = ({
   }, [paneRows, containerSize]);
 
   // Calculate the row heights in pixels.
-  useLayoutEffect(() => {
+  useIsomorphicLayoutEffect(() => {
     if (containerSize.height === 0) return;
 
     // Return if the row heights have already been calculated.

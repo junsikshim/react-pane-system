@@ -1,0 +1,12 @@
+{
+  "root": true,
+  "plugins": ["prettier", "@typescript-eslint"],
+  "extends": ["prettier", "plugin:@typescript-eslint/recommended"],
+  "parser": "@typescript-eslint/parser",
+  "rules": {
+    "prettier/prettier": "error",
+    "no-console": "warn",
+    "@typescript-eslint/no-unused-vars": ["warn", { "argsIgnorePattern": "^_" }]
+  },
+  "ignorePatterns": ["node_modules", "*.js"]
+}

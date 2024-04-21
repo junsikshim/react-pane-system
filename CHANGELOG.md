@@ -1,5 +1,13 @@
 # react-pane-system
 
+## 0.3.0
+
+### Minor Changes
+
+- 125125e: - Refactor splitters to enable intersections.
+  - Apply eslint.
+  - Update readme.
+
 ## 0.2.8
 
 ### Patch Changes

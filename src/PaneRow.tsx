@@ -6,12 +6,15 @@ import {
   ReactElement,
   createElement,
   useCallback,
+  useContext,
   useMemo,
+  useRef,
   useState
 } from 'react';
 import { InnerPane, PaneProps } from './Pane';
-import { sizeToPixels, limit } from './utils';
-import RowSplitter from './RowSplitter';
+import { sizeToPixels, limit, createId } from './utils';
+import { SplitterRegistry } from './splitter/SplitterRegistry';
+import { PaneSystemRectContext } from './registry/PaneSystemRectContext';
 import useIsomorphicLayoutEffect from './hooks/useIsomorphicLayoutEffect';
 
 export interface PaneRowProps extends PropsWithChildren {
@@ -27,6 +30,7 @@ export interface PaneRowProps extends PropsWithChildren {
 }
 
 const PaneRow = ({ children }: PaneRowProps) => children;
+PaneRow.displayName = 'PaneRow';
 
 export default PaneRow;
 
@@ -34,12 +38,9 @@ export interface InnerPaneRowProps {
   index: number;
   totalRows: number;
   containerWidth: number;
+  containerHeight: number;
   top: number;
   height: number;
-  splitter?: 'top' | 'bottom';
-  splitterHeight?: number;
-  splitterColor?: string;
-  onSplitterDrag?: (dy: number) => void;
   bgColor?: string;
   borderWidth?: number;
   borderColor?: string;
@@ -51,15 +52,17 @@ export const InnerPaneRow = ({
   containerWidth,
   top,
   height,
-  splitter,
-  splitterHeight,
-  splitterColor,
-  onSplitterDrag,
   bgColor,
   borderWidth,
   borderColor,
   children
 }: PropsWithChildren<InnerPaneRowProps>) => {
+  const ref = useRef<HTMLDivElement>(null);
+  const splitterIds = useRef<string[]>([]);
+
+  const { addSplitter, removeSplitter } = useContext(SplitterRegistry);
+  const [containerRect] = useContext(PaneSystemRectContext);
+
   // The widths of the Pane components in pixels.
   const [paneWidthPxs, setPaneWidthPxs] = useState<number[]>([]);
 
@@ -119,6 +122,31 @@ export const InnerPaneRow = ({
     setPaneWidthPxs(nonAutoWidthPxs);
   }, [containerWidth, paneWidths, paneMinWidthPxs, paneMaxWidthPxs]);
 
+  const cols = useMemo(() => {
+    let left = 0;
+
+    return panes.map((pane, index) => {
+      const c = createElement(
+        InnerPane,
+        {
+          key: index,
+          index,
+          totalPanes: panes.length,
+          left,
+          width: paneWidthPxs[index],
+          bgColor: pane.props.bgColor ?? bgColor,
+          borderWidth: pane.props.borderWidth ?? borderWidth,
+          borderColor: pane.props.borderColor ?? borderColor
+        },
+        pane.props.children
+      );
+
+      left += paneWidthPxs[index];
+
+      return c;
+    });
+  }, [panes, paneWidthPxs, bgColor, borderWidth, borderColor]);
+
   // Drag handler for the splitters.
   const onPaneSplitterDrag = useCallback(
     (index: number) => (dx: number) => {
@@ -157,37 +185,73 @@ export const InnerPaneRow = ({
     [paneWidths, paneMinWidthPxs, paneMaxWidthPxs]
   );
 
-  const cols = useMemo(() => {
+  useIsomorphicLayoutEffect(() => {
+    if (!ref.current) return;
+
+    const rect = ref.current.getBoundingClientRect();
     let left = 0;
 
-    return panes.map((pane, index) => {
-      const c = createElement(
-        InnerPane,
-        {
-          key: index,
-          index,
-          totalPanes: panes.length,
-          left,
-          width: paneWidthPxs[index],
-          splitter: pane.props.splitter,
-          splitterWidth: pane.props.splitterWidth,
-          splitterColor: pane.props.splitterColor,
-          onSplitterDrag: onPaneSplitterDrag(index),
-          bgColor: pane.props.bgColor ?? bgColor,
-          borderWidth: pane.props.borderWidth ?? borderWidth,
-          borderColor: pane.props.borderColor ?? borderColor
-        },
-        pane.props.children
-      );
-
+    panes.forEach((pane, index) => {
       left += paneWidthPxs[index];
 
-      return c;
+      // Add a splitter if the column has a splitter.
+      if (pane.props.splitter === 'left' || pane.props.splitter === 'right') {
+        const x =
+          rect.x +
+          left +
+          (pane.props.splitter === 'left' ? -paneWidthPxs[index] : 0) -
+          containerRect.left;
+        const y = rect.y - containerRect.top;
+        const sWidth = pane.props.splitterWidth ?? 4;
+        const sHeight = height;
+        const color = pane.props.splitterColor ?? 'rgba(0, 0, 0, 0.2)';
+        const boundMinX = rect.x;
+        const boundMaxX = rect.x + paneWidthPxs[index];
+        const boundMinY = y;
+        const boundMaxY = y + sHeight;
+
+        // Return if the positions are invalid.
+        if (Number.isNaN(x) || Number.isNaN(y)) return;
+
+        let id = splitterIds.current[index];
+
+        // Keep track of the splitter IDs.
+        if (!id) {
+          id = createId();
+          splitterIds.current[index] = id;
+        }
+
+        addSplitter({
+          id,
+          orientation: 'vertical',
+          x,
+          y,
+          width: sWidth,
+          height: sHeight,
+          color,
+          bounds: {
+            minX: boundMinX,
+            minY: boundMinY,
+            maxX: boundMaxX,
+            maxY: boundMaxY
+          },
+          onDrag: onPaneSplitterDrag(index)
+        });
+      }
     });
-  }, [panes, paneWidthPxs, onPaneSplitterDrag]);
+  }, [
+    panes,
+    containerRect,
+    paneWidthPxs,
+    addSplitter,
+    removeSplitter,
+    onPaneSplitterDrag,
+    height
+  ]);
 
   return (
     <div
+      ref={ref}
       className="pane-row"
       style={{
         top: `${top}px`,
@@ -211,25 +275,7 @@ export const InnerPaneRow = ({
         />
       )}
 
-      {splitter === 'top' && onSplitterDrag && (
-        <RowSplitter
-          offsetTop={0}
-          onDrag={onSplitterDrag}
-          height={splitterHeight}
-          color={splitterColor}
-        />
-      )}
-
       {cols}
-
-      {splitter === 'bottom' && onSplitterDrag && (
-        <RowSplitter
-          offsetTop={height}
-          onDrag={onSplitterDrag}
-          height={splitterHeight}
-          color={splitterColor}
-        />
-      )}
     </div>
   );
 };

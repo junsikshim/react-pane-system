@@ -1,12 +1,25 @@
 {
   "root": true,
   "plugins": ["prettier", "@typescript-eslint"],
-  "extends": ["prettier", "plugin:@typescript-eslint/recommended"],
+  "extends": [
+    "prettier",
+    "plugin:@typescript-eslint/recommended",
+    "plugin:react-hooks/recommended"
+  ],
   "parser": "@typescript-eslint/parser",
   "rules": {
     "prettier/prettier": "error",
-    "no-console": "warn",
-    "@typescript-eslint/no-unused-vars": ["warn", { "argsIgnorePattern": "^_" }]
+    "no-console": [
+      "warn",
+      {
+        "allow": ["warn", "error"]
+      }
+    ],
+    "@typescript-eslint/no-unused-vars": [
+      "warn",
+      { "argsIgnorePattern": "^_" }
+    ],
+    "@typescript-eslint/no-empty-function": "off"
   },
   "ignorePatterns": ["node_modules", "*.js"]
 }

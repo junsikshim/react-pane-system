@@ -1,8 +1,8 @@
-import { RefCallback, useCallback, useRef } from 'react';
+import { RefCallback, RefObject, useCallback, useRef } from 'react';
 
 const useResizableRef = <T extends HTMLElement>(
   callback: (width: number, height: number) => void
-): RefCallback<T> => {
+): [RefObject<T>, RefCallback<T>] => {
   const resizeObserver = useRef<ResizeObserver | null>(null);
   const ref = useRef<T | null>(null);
 
@@ -24,7 +24,7 @@ const useResizableRef = <T extends HTMLElement>(
     ref.current = node;
   }, []);
 
-  return setRef;
+  return [ref, setRef];
 };
 
 export default useResizableRef;

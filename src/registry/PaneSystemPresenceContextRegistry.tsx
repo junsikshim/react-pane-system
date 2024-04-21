@@ -28,5 +28,5 @@ export const useNestedPaneSystemChecker = () => {
         "Warning: <PaneSystem /> isn't the only direct child of <Pane />. Unexpected side effects may occur."
       );
     }
-  }, []);
+  }, [paneSystemPresence]);
 };

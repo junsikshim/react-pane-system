@@ -1,13 +1,11 @@
 'use client';
 
-import useDelayedHover from './hooks/useDelayedHover';
-import { useEffect, useRef } from 'react';
+import { Splitter, SplitterRegistry } from './SplitterRegistry';
+import { useContext, useEffect, useRef } from 'react';
+import useDelayedHover from '../hooks/useDelayedHover';
 
-interface RowSplitterProps {
-  offsetTop: number;
-  onDrag: (dy: number) => void;
-  height?: number;
-  color?: string;
+interface PaneRowSplitterProps {
+  splitter: Splitter;
 }
 
 type DragState = {
@@ -15,48 +13,49 @@ type DragState = {
   currentY: number;
 };
 
-const RowSplitter = ({
-  offsetTop,
-  onDrag,
-  height = 4,
-  color = '#fff'
-}: RowSplitterProps) => {
+const PaneRowSplitter = ({ splitter }: PaneRowSplitterProps) => {
   const ref = useRef<HTMLDivElement>(null);
   const dragState = useRef<DragState | null>(null);
   const { isHover, onPointerEnter, onPointerLeave } = useDelayedHover();
+  const { currentSplitterIds, setCurrentSplitterIds } =
+    useContext(SplitterRegistry);
 
   useEffect(() => {
     if (!ref.current) return;
 
-    const splitter = ref.current;
+    const s = ref.current;
 
     const onPointerDown = (e: PointerEvent) => {
-      if (!splitter) return;
+      if (!s) return;
 
-      splitter.setPointerCapture(e.pointerId);
+      s.setPointerCapture(e.pointerId);
 
       dragState.current = {
         startY: e.clientY,
         currentY: e.clientY
       };
 
+      setCurrentSplitterIds([splitter.id]);
+
       const onPointerMove = (e: PointerEvent) => {
-        if (!splitter) return;
+        if (!s) return;
         if (!dragState.current) return;
 
         const dy = e.clientY - dragState.current.currentY;
 
-        onDrag(dy);
+        splitter.onDrag(dy);
 
         dragState.current.currentY = e.clientY;
       };
 
       const onPointerUp = () => {
-        if (!splitter) return;
+        if (!s) return;
 
-        splitter.releasePointerCapture(e.pointerId);
+        s.releasePointerCapture(e.pointerId);
 
         dragState.current = null;
+
+        setCurrentSplitterIds([]);
 
         window.removeEventListener('pointermove', onPointerMove);
         window.removeEventListener('pointerup', onPointerUp);
@@ -66,12 +65,20 @@ const RowSplitter = ({
       window.addEventListener('pointerup', onPointerUp);
     };
 
-    splitter.addEventListener('pointerdown', onPointerDown);
+    s.addEventListener('pointerdown', onPointerDown);
 
     return () => {
-      splitter.removeEventListener('pointerdown', onPointerDown);
+      s.removeEventListener('pointerdown', onPointerDown);
     };
-  }, [onDrag]);
+  }, [splitter, setCurrentSplitterIds]);
+
+  const x = `${splitter.x}px`;
+  const y = `${splitter.y}px`;
+  const width = `${splitter.width}px`;
+  const height = `${splitter.height}px`;
+  const color = splitter.color;
+  const background =
+    isHover || currentSplitterIds.includes(splitter.id) ? color : 'transparent';
 
   return (
     <div
@@ -79,14 +86,15 @@ const RowSplitter = ({
       className="splitter"
       style={{
         position: 'absolute',
-        width: '100%',
-        height: `${height}px`,
-        left: 0,
-        background: isHover ? color : 'transparent',
+        width,
+        height,
+        left: x,
+        top: y,
+        background,
         cursor: 'row-resize',
         zIndex: 10,
         transition: 'background-color 0.2s',
-        transform: `translateY(${offsetTop - height / 2}px)`
+        transform: `translateY(-${splitter.height / 2}px)`
       }}
       onPointerEnter={onPointerEnter}
       onPointerLeave={onPointerLeave}
@@ -94,4 +102,4 @@ const RowSplitter = ({
   );
 };
 
-export default RowSplitter;
+export default PaneRowSplitter;

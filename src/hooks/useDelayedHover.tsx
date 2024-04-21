@@ -2,7 +2,7 @@
 
 import { useRef, useState } from 'react';
 
-const useDelayedHover = (delayMs: number = 300) => {
+const useDelayedHover = (delayMs = 300) => {
   const [isHover, setIsHover] = useState(false);
   const timeout = useRef<number | null>(null);
 

@@ -170,7 +170,15 @@ const CorePaneSystem = ({
 
       return r;
     });
-  }, [paneRows, rowHeightPxs, containerSize.width]);
+  }, [
+    paneRows,
+    rowHeightPxs,
+    containerSize.width,
+    containerSize.height,
+    bgColor,
+    borderWidth,
+    borderColor
+  ]);
 
   // Drag handler for the row splitter.
   const onRowSplitterDrag = useCallback(
@@ -210,7 +218,7 @@ const CorePaneSystem = ({
     [setRowHeightPxs, rowHeights, rowMinHeightPxs, rowMaxHeightPxs]
   );
 
-  useEffect(() => {
+  useIsomorphicLayoutEffect(() => {
     if (!ref.current) return;
 
     const rect = ref.current.getBoundingClientRect();
@@ -272,7 +280,8 @@ const CorePaneSystem = ({
     addSplitter,
     removeSplitter,
     onRowSplitterDrag,
-    createId
+    splitterIds,
+    ref
   ]);
 
   return (
@@ -346,7 +355,7 @@ export const InnerPaneSystem = ({
   useEffect(() => {
     if (!parentContainerSize) return;
 
-    const { width, height } = parentContainerSize!;
+    const { width, height } = parentContainerSize;
 
     if (width) setContainerSize((prev) => ({ ...prev, width }));
     if (height) setContainerSize((prev) => ({ ...prev, height }));

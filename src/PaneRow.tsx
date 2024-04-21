@@ -7,7 +7,6 @@ import {
   createElement,
   useCallback,
   useContext,
-  useEffect,
   useMemo,
   useRef,
   useState
@@ -51,7 +50,6 @@ export const InnerPaneRow = ({
   index,
   totalRows,
   containerWidth,
-  containerHeight,
   top,
   height,
   bgColor,
@@ -147,7 +145,7 @@ export const InnerPaneRow = ({
 
       return c;
     });
-  }, [panes, paneWidthPxs]);
+  }, [panes, paneWidthPxs, bgColor, borderWidth, borderColor]);
 
   // Drag handler for the splitters.
   const onPaneSplitterDrag = useCallback(
@@ -187,7 +185,7 @@ export const InnerPaneRow = ({
     [paneWidths, paneMinWidthPxs, paneMaxWidthPxs]
   );
 
-  useEffect(() => {
+  useIsomorphicLayoutEffect(() => {
     if (!ref.current) return;
 
     const rect = ref.current.getBoundingClientRect();
@@ -248,7 +246,7 @@ export const InnerPaneRow = ({
     addSplitter,
     removeSplitter,
     onPaneSplitterDrag,
-    createId
+    height
   ]);
 
   return (

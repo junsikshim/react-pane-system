@@ -2,11 +2,10 @@ import {
   PropsWithChildren,
   createContext,
   useCallback,
-  useEffect,
   useMemo,
   useState
 } from 'react';
-import { createId, isEqual } from '../utils';
+import { isEqual } from '../utils';
 
 export type Splitter = {
   id: string;
@@ -40,10 +39,10 @@ const SPLITTER_INTERSECTION_PADDING = 2;
 
 const initialState = {
   splitters: [] as Splitter[],
-  addSplitter: (splitter: Splitter) => {},
-  removeSplitter: (id: string) => {},
+  addSplitter: (_splitter: Splitter) => {},
+  removeSplitter: (_id: string) => {},
   currentSplitterIds: [] as string[],
-  setCurrentSplitterIds: (ids: string[]) => {},
+  setCurrentSplitterIds: (_ids: string[]) => {},
   intersections: [] as SplitterIntersection[]
 };
 
@@ -51,9 +50,6 @@ export const SplitterRegistry = createContext(initialState);
 
 export const SplitterRegistryProvider = ({ children }: PropsWithChildren) => {
   const [splitters, setSplitters] = useState<Record<string, Splitter>>({});
-  const [intersections, setIntersections] = useState<SplitterIntersection[]>(
-    []
-  );
 
   // The ID of the current splitter if exists.
   const [currentSplitterIds, setCurrentSplitterIds] = useState<string[]>([]);
@@ -80,7 +76,8 @@ export const SplitterRegistryProvider = ({ children }: PropsWithChildren) => {
 
   const splittersArray = useMemo(() => Object.values(splitters), [splitters]);
 
-  useEffect(() => {
+  // Find intersections between splitters.
+  const intersections = useMemo(() => {
     const list = [] as SplitterIntersection[];
 
     // Find intersections between splitters.
@@ -96,7 +93,7 @@ export const SplitterRegistryProvider = ({ children }: PropsWithChildren) => {
         if (s1.orientation === 'horizontal' && s2.orientation === 'vertical') {
           if (isEqual(s1.x, s2.x) || isEqual(s1.x + s1.width, s2.x)) {
             list.push({
-              id: createId(),
+              id: `${s1.id}-${s2.id}`,
               x: s2.x,
               y: s1.y,
               width: s2.width + SPLITTER_INTERSECTION_PADDING * 2,
@@ -112,7 +109,7 @@ export const SplitterRegistryProvider = ({ children }: PropsWithChildren) => {
         if (s1.orientation === 'vertical' && s2.orientation === 'horizontal') {
           if (isEqual(s1.x, s2.x) || isEqual(s1.x, s2.x + s2.width)) {
             list.push({
-              id: createId(),
+              id: `${s1.id}-${s2.id}`,
               x: s1.x,
               y: s2.y,
               width: s1.width + SPLITTER_INTERSECTION_PADDING * 2,
@@ -127,8 +124,8 @@ export const SplitterRegistryProvider = ({ children }: PropsWithChildren) => {
       }
     }
 
-    setIntersections(list);
-  }, [splitters, createId]);
+    return list;
+  }, [splittersArray]);
 
   return (
     <SplitterRegistry.Provider

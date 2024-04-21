@@ -93,11 +93,10 @@ const SplitterIntersectionHandle = ({
   }, [splitter1, splitter2, setCurrentSplitterIds]);
 
   // Adjust hover state.
-  // TODO - Need to keep hover state while dragging.
   useEffect(() => {
     if (isHover) setCurrentSplitterIds([splitter1.id, splitter2.id]);
     else if (!dragState.current) setCurrentSplitterIds([]);
-  }, [isHover, splitter1, splitter2]);
+  }, [isHover, splitter1, splitter2, setCurrentSplitterIds]);
 
   const x = `${handleX}px`;
   const y = `${handleY}px`;

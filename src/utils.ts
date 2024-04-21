@@ -33,6 +33,8 @@ export const limit = (number: number, min: number, max: number) => {
 // Check if the given value is a valid Pane System component.
 export const isPaneSystemComponent =
   (type: PaneSystemComponentType) =>
+  // `any` is fine here.
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
   (value: any): value is Component & { displayName: typeof type } => {
     return (
       value &&

@@ -1,5 +1,11 @@
 # react-pane-system
 
+## 0.3.1
+
+### Patch Changes
+
+- 7619c49: Fix splitter going out of bounds.
+
 ## 0.3.0
 
 ### Minor Changes

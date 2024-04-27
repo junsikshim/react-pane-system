@@ -235,7 +235,7 @@ const CorePaneSystem = ({
           top +
           (row.props.splitter === 'top' ? -rowHeightPxs[index] : 0) -
           containerRect.top;
-        const sWidth = containerSize.width;
+        const sWidth = rect.width;
         const sHeight = row.props.splitterHeight ?? 4;
         const color = row.props.splitterColor ?? 'rgba(0, 0, 0, 0.2)';
         const boundMinX = x;

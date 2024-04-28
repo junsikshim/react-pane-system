@@ -1,5 +1,11 @@
 # react-pane-system
 
+## 0.3.2
+
+### Patch Changes
+
+- 96dc05f: Fix regex for floats.
+
 ## 0.3.1
 
 ### Patch Changes

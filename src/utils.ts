@@ -5,7 +5,7 @@ import type { PaneSystemComponentType } from './PaneSystem';
 export const sizeToPixels = (size: string | number, relativeTo?: number) => {
   if (typeof size === 'number') return size;
 
-  const [number, unit] = size.split(/(\d+)/).filter(Boolean);
+  const [number, unit] = size.split(/(\d+\.?\d*)/).filter(Boolean);
 
   // If there's no unit, return the number as is.
   if (!unit) return +number;

@@ -294,8 +294,8 @@ const CorePaneSystem = ({
         position: 'relative'
       }}
     >
-      {rows}
       {isRoot && <SplitterLayer />}
+      {rows}
     </div>
   );
 };

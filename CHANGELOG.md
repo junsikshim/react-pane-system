@@ -1,5 +1,11 @@
 # react-pane-system
 
+## 0.3.3
+
+### Patch Changes
+
+- bf2ea86: Change layer order.
+
 ## 0.3.2
 
 ### Patch Changes

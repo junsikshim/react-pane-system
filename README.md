@@ -7,9 +7,17 @@ Allows pixel and percent values to sizes(including min and max).
 
 ---
 
+## Install
+
+```sh
+> npm install react-pane-system
+```
+
 ## Usage
 
 ```jsx
+import { PaneSystem, PaneRow, Pane } from 'react-pane-system';
+
 <PaneSystem width="100vw" height="100vh">
   <PaneRow>
     {/* A pane with a splitter on the right side */}
@@ -28,7 +36,7 @@ Allows pixel and percent values to sizes(including min and max).
       <div>Right Pane</div>
     </Pane>
   </PaneRow>
-</PaneSystem>
+</PaneSystem>;
 ```
 
 ## Documentation

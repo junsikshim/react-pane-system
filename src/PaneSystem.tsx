@@ -44,6 +44,7 @@ interface CorePaneSystemProps extends PropsWithChildren {
   bgColor?: string;
   borderWidth?: number;
   borderColor?: string;
+  gap?: number;
 }
 
 export const paneSystemComponentType = [
@@ -60,6 +61,7 @@ const CorePaneSystem = ({
   bgColor = '#4b5563',
   borderWidth = 1,
   borderColor = '#909090',
+  gap = 0,
   children
 }: PropsWithChildren<CorePaneSystemProps>) => {
   // Container size in pixels.
@@ -114,9 +116,9 @@ const CorePaneSystem = ({
   const rowMaxHeightPxs = useMemo<number[]>(() => {
     return paneRows.map((r) => {
       const maxHeight = r.props.maxHeight ?? '100%';
-      return sizeToPixels(maxHeight, containerSize.height);
+      return sizeToPixels(maxHeight, containerSize.height) - gap;
     });
-  }, [paneRows, containerSize]);
+  }, [paneRows, containerSize, gap]);
 
   // Calculate the row heights in pixels.
   useIsomorphicLayoutEffect(() => {
@@ -135,8 +137,11 @@ const CorePaneSystem = ({
     const nonAutoHeightPxs = nonAutoHeights.map((h) =>
       sizeToPixels(h, containerSize.height)
     );
+    const totalGapPx = nonAutoHeightPxs.length * gap;
     const autoHeightPx =
-      containerSize.height - nonAutoHeightPxs.reduce((a, b) => a + b, 0);
+      containerSize.height -
+      nonAutoHeightPxs.reduce((a, b) => a + b, 0) -
+      totalGapPx;
     const autoHeightIndex = rowHeights.findIndex((h) => h === 'auto');
 
     if (autoHeightIndex !== -1)
@@ -161,12 +166,13 @@ const CorePaneSystem = ({
           height: rowHeightPxs[index],
           bgColor: row.props.bgColor ?? bgColor,
           borderWidth: row.props.borderWidth ?? borderWidth,
-          borderColor: row.props.borderColor ?? borderColor
+          borderColor: row.props.borderColor ?? borderColor,
+          gap: row.props.gap ?? gap
         },
         row.props.children
       );
 
-      top += rowHeightPxs[index];
+      top += rowHeightPxs[index] + gap;
 
       return r;
     });
@@ -177,7 +183,8 @@ const CorePaneSystem = ({
     containerSize.height,
     bgColor,
     borderWidth,
-    borderColor
+    borderColor,
+    gap
   ]);
 
   // Drag handler for the row splitter.
@@ -192,10 +199,10 @@ const CorePaneSystem = ({
         setRowHeightPxs((prev) => {
           const clone = [...prev];
 
-          const totalHeight = clone[index - 1] + clone[index];
+          const totalHeight = clone[index - 1] + clone[index] + gap;
           const bottomHeight = limit(clone[index] - dy, min, max);
 
-          clone[index - 1] = totalHeight - bottomHeight;
+          clone[index - 1] = totalHeight - bottomHeight - gap;
           clone[index] = bottomHeight;
 
           return clone;
@@ -205,17 +212,17 @@ const CorePaneSystem = ({
         setRowHeightPxs((prev) => {
           const clone = [...prev];
 
-          const totalHeight = clone[index] + clone[index + 1];
+          const totalHeight = clone[index] + clone[index + 1] + gap;
           const topHeight = limit(clone[index] + dy, min, max);
 
           clone[index] = topHeight;
-          clone[index + 1] = totalHeight - topHeight;
+          clone[index + 1] = totalHeight - topHeight - gap;
 
           return clone;
         });
       }
     },
-    [setRowHeightPxs, rowHeights, rowMinHeightPxs, rowMaxHeightPxs]
+    [setRowHeightPxs, rowHeights, rowMinHeightPxs, rowMaxHeightPxs, gap]
   );
 
   useIsomorphicLayoutEffect(() => {
@@ -225,14 +232,15 @@ const CorePaneSystem = ({
     let top = 0;
 
     paneRows.forEach((row, index) => {
-      top += rowHeightPxs[index];
+      top += rowHeightPxs[index] + gap;
 
       // Add a splitter if the row has a splitter.
       if (row.props.splitter === 'top' || row.props.splitter === 'bottom') {
         const x = rect.x - containerRect.left;
         const y =
           rect.y +
-          top +
+          top -
+          gap / 2 +
           (row.props.splitter === 'top' ? -rowHeightPxs[index] : 0) -
           containerRect.top;
         const sWidth = rect.width;
@@ -281,7 +289,8 @@ const CorePaneSystem = ({
     removeSplitter,
     onRowSplitterDrag,
     splitterIds,
-    ref
+    ref,
+    gap
   ]);
 
   return (
@@ -307,6 +316,7 @@ interface PaneSystemProps extends PropsWithChildren {
   bgColor?: string;
   borderWidth?: number;
   borderColor?: string;
+  gap?: number;
 }
 
 const PaneSystem = (props: PaneSystemProps) => {

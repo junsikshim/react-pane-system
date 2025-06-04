@@ -27,6 +27,7 @@ export interface PaneRowProps extends PropsWithChildren {
   bgColor?: string;
   borderWidth?: number;
   borderColor?: string;
+  gap?: number;
 }
 
 const PaneRow = ({ children }: PaneRowProps) => children;
@@ -44,6 +45,7 @@ export interface InnerPaneRowProps {
   bgColor?: string;
   borderWidth?: number;
   borderColor?: string;
+  gap: number;
 }
 
 export const InnerPaneRow = ({
@@ -55,6 +57,7 @@ export const InnerPaneRow = ({
   bgColor,
   borderWidth,
   borderColor,
+  gap,
   children
 }: PropsWithChildren<InnerPaneRowProps>) => {
   const ref = useRef<HTMLDivElement>(null);
@@ -93,9 +96,9 @@ export const InnerPaneRow = ({
   const paneMaxWidthPxs = useMemo<number[]>(() => {
     return panes.map((p) => {
       const maxWidth = p.props.maxWidth ?? '100%';
-      return sizeToPixels(maxWidth, containerWidth);
+      return sizeToPixels(maxWidth, containerWidth) - gap;
     });
-  }, [panes, containerWidth]);
+  }, [panes, containerWidth, gap]);
 
   // Calculate the column widths in pixels.
   useIsomorphicLayoutEffect(() => {
@@ -111,9 +114,9 @@ export const InnerPaneRow = ({
     const nonAutoWidthPxs = nonAutoWidths
       .map((w) => sizeToPixels(w, containerWidth))
       .map((n, i) => limit(n, paneMinWidthPxs[i], paneMaxWidthPxs[i]));
-
+    const totalGapPx = nonAutoWidthPxs.length * gap;
     const autoWidthPx =
-      containerWidth - nonAutoWidthPxs.reduce((a, b) => a + b, 0);
+      containerWidth - nonAutoWidthPxs.reduce((a, b) => a + b, 0) - totalGapPx;
     const autoWidthIndex = paneWidths.findIndex((w) => w === 'auto');
 
     if (autoWidthIndex !== -1)
@@ -141,11 +144,11 @@ export const InnerPaneRow = ({
         pane.props.children
       );
 
-      left += paneWidthPxs[index];
+      left += paneWidthPxs[index] + gap;
 
       return c;
     });
-  }, [panes, paneWidthPxs, bgColor, borderWidth, borderColor]);
+  }, [panes, paneWidthPxs, bgColor, borderWidth, borderColor, gap]);
 
   // Drag handler for the splitters.
   const onPaneSplitterDrag = useCallback(
@@ -159,10 +162,10 @@ export const InnerPaneRow = ({
         setPaneWidthPxs((prev) => {
           const clone = [...prev];
 
-          const totalWidth = clone[index - 1] + clone[index];
+          const totalWidth = clone[index - 1] + clone[index] + gap;
           const rightWidth = limit(clone[index] - dx, min, max);
 
-          clone[index - 1] = totalWidth - rightWidth;
+          clone[index - 1] = totalWidth - rightWidth - gap;
           clone[index] = rightWidth;
 
           return clone;
@@ -172,17 +175,17 @@ export const InnerPaneRow = ({
         setPaneWidthPxs((prev) => {
           const clone = [...prev];
 
-          const totalWidth = clone[index] + clone[index + 1];
+          const totalWidth = clone[index] + clone[index + 1] + gap;
           const leftWidth = limit(clone[index] + dx, min, max);
 
           clone[index] = leftWidth;
-          clone[index + 1] = totalWidth - leftWidth;
+          clone[index + 1] = totalWidth - leftWidth - gap;
 
           return clone;
         });
       }
     },
-    [paneWidths, paneMinWidthPxs, paneMaxWidthPxs]
+    [paneWidths, paneMinWidthPxs, paneMaxWidthPxs, gap]
   );
 
   useIsomorphicLayoutEffect(() => {
@@ -192,13 +195,14 @@ export const InnerPaneRow = ({
     let left = 0;
 
     panes.forEach((pane, index) => {
-      left += paneWidthPxs[index];
+      left += paneWidthPxs[index] + gap;
 
       // Add a splitter if the column has a splitter.
       if (pane.props.splitter === 'left' || pane.props.splitter === 'right') {
         const x =
           rect.x +
-          left +
+          left -
+          gap / 2 +
           (pane.props.splitter === 'left' ? -paneWidthPxs[index] : 0) -
           containerRect.left;
         const y = rect.y - containerRect.top;
@@ -246,7 +250,8 @@ export const InnerPaneRow = ({
     addSplitter,
     removeSplitter,
     onPaneSplitterDrag,
-    height
+    height,
+    gap
   ]);
 
   return (

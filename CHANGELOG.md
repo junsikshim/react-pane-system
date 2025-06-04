@@ -1,5 +1,11 @@
 # react-pane-system
 
+## 0.4.0
+
+### Minor Changes
+
+- 82a12a9: Add 'gap' prop.
+
 ## 0.3.3
 
 ### Patch Changes

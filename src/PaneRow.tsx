@@ -1,6 +1,7 @@
 'use client';
 
 import {
+  CSSProperties,
   Children,
   PropsWithChildren,
   ReactElement,
@@ -24,10 +25,13 @@ export interface PaneRowProps extends PropsWithChildren {
   splitter?: 'top' | 'bottom';
   splitterHeight?: number;
   splitterColor?: string;
+  splitterStyles?: CSSProperties;
   bgColor?: string;
   borderWidth?: number;
   borderColor?: string;
+  borderStyles?: CSSProperties;
   gap?: number;
+  styles?: CSSProperties;
 }
 
 const PaneRow = ({ children }: PaneRowProps) => children;
@@ -45,7 +49,9 @@ export interface InnerPaneRowProps {
   bgColor?: string;
   borderWidth?: number;
   borderColor?: string;
+  borderStyles?: CSSProperties;
   gap: number;
+  styles?: CSSProperties;
 }
 
 export const InnerPaneRow = ({
@@ -57,7 +63,9 @@ export const InnerPaneRow = ({
   bgColor,
   borderWidth,
   borderColor,
+  borderStyles,
   gap,
+  styles = {},
   children
 }: PropsWithChildren<InnerPaneRowProps>) => {
   const ref = useRef<HTMLDivElement>(null);
@@ -139,7 +147,9 @@ export const InnerPaneRow = ({
           width: paneWidthPxs[index],
           bgColor: pane.props.bgColor ?? bgColor,
           borderWidth: pane.props.borderWidth ?? borderWidth,
-          borderColor: pane.props.borderColor ?? borderColor
+          borderColor: pane.props.borderColor ?? borderColor,
+          borderStyles: pane.props.borderStyles ?? borderStyles,
+          styles: pane.props.styles ?? styles
         },
         pane.props.children
       );
@@ -148,7 +158,16 @@ export const InnerPaneRow = ({
 
       return c;
     });
-  }, [panes, paneWidthPxs, bgColor, borderWidth, borderColor, gap]);
+  }, [
+    panes,
+    paneWidthPxs,
+    bgColor,
+    borderWidth,
+    borderColor,
+    borderStyles,
+    styles,
+    gap
+  ]);
 
   // Drag handler for the splitters.
   const onPaneSplitterDrag = useCallback(
@@ -209,6 +228,7 @@ export const InnerPaneRow = ({
         const sWidth = pane.props.splitterWidth ?? 4;
         const sHeight = height;
         const color = pane.props.splitterColor ?? 'rgba(0, 0, 0, 0.2)';
+        const styles = pane.props.splitterStyles ?? {};
         const boundMinX = rect.x;
         const boundMaxX = rect.x + paneWidthPxs[index];
         const boundMinY = y;
@@ -233,6 +253,7 @@ export const InnerPaneRow = ({
           width: sWidth,
           height: sHeight,
           color,
+          styles,
           bounds: {
             minX: boundMinX,
             minY: boundMinY,
@@ -262,7 +283,8 @@ export const InnerPaneRow = ({
         top: `${top}px`,
         height: `${height}px`,
         position: 'absolute',
-        width: '100%'
+        width: '100%',
+        ...styles
       }}
     >
       {/* Border on the bottom side of the row */}
@@ -275,7 +297,8 @@ export const InnerPaneRow = ({
             width: '100%',
             height: `${borderWidth}px`,
             backgroundColor: borderColor,
-            zIndex: 1
+            zIndex: 1,
+            ...borderStyles
           }}
         />
       )}

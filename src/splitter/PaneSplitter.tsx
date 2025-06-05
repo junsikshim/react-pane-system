@@ -83,7 +83,7 @@ const PaneSplitter = ({ splitter }: PaneSplitterProps) => {
   return (
     <div
       ref={ref}
-      className="splitter"
+      className="splitter splitter-horizontal"
       style={{
         position: 'absolute',
         width,
@@ -94,7 +94,8 @@ const PaneSplitter = ({ splitter }: PaneSplitterProps) => {
         cursor: 'col-resize',
         zIndex: 10,
         transition: 'background-color 0.2s',
-        transform: `translateX(-${splitter.width / 2}px)`
+        transform: `translateX(-${splitter.width / 2}px)`,
+        ...splitter.styles
       }}
       onPointerEnter={onPointerEnter}
       onPointerLeave={onPointerLeave}

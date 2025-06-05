@@ -1,4 +1,5 @@
 import {
+  CSSProperties,
   PropsWithChildren,
   createContext,
   useCallback,
@@ -15,6 +16,7 @@ export type Splitter = {
   width: number;
   height: number;
   color: string;
+  styles: CSSProperties;
   bounds: {
     minX: number;
     minY: number;

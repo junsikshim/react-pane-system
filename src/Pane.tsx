@@ -1,6 +1,7 @@
 'use client';
 
 import {
+  CSSProperties,
   PropsWithChildren,
   createElement,
   isValidElement,
@@ -16,9 +17,12 @@ export interface PaneProps extends PropsWithChildren {
   splitter?: 'left' | 'right';
   splitterWidth?: number;
   splitterColor?: string;
+  splitterStyles?: CSSProperties;
   bgColor?: string;
   borderWidth?: number;
   borderColor?: string;
+  borderStyles?: CSSProperties;
+  styles?: CSSProperties;
 }
 
 const Pane = ({ children }: PaneProps) => children;
@@ -34,6 +38,8 @@ export interface InnerPaneProps {
   bgColor?: string;
   borderWidth?: number;
   borderColor?: string;
+  borderStyles?: CSSProperties;
+  styles?: CSSProperties;
 }
 
 export const InnerPane = ({
@@ -44,6 +50,8 @@ export const InnerPane = ({
   bgColor,
   borderWidth,
   borderColor,
+  borderStyles,
+  styles,
   children: _children
 }: PropsWithChildren<InnerPaneProps>) => {
   const children = useMemo(() => {
@@ -84,7 +92,8 @@ export const InnerPane = ({
           position: 'absolute',
           height: '100%',
           backgroundColor: bgColor,
-          overflow: 'hidden'
+          overflow: 'hidden',
+          ...styles
         }}
       >
         {/* Border on the right side of the pane */}
@@ -96,7 +105,8 @@ export const InnerPane = ({
               right: 0,
               width: `${borderWidth}px`,
               height: '100%',
-              backgroundColor: borderColor
+              backgroundColor: borderColor,
+              ...borderStyles
             }}
           />
         )}

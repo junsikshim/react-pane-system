@@ -83,7 +83,7 @@ const PaneRowSplitter = ({ splitter }: PaneRowSplitterProps) => {
   return (
     <div
       ref={ref}
-      className="splitter"
+      className="splitter splitter-vertical"
       style={{
         position: 'absolute',
         width,
@@ -94,7 +94,8 @@ const PaneRowSplitter = ({ splitter }: PaneRowSplitterProps) => {
         cursor: 'row-resize',
         zIndex: 10,
         transition: 'background-color 0.2s',
-        transform: `translateY(-${splitter.height / 2}px)`
+        transform: `translateY(-${splitter.height / 2}px)`,
+        ...splitter.styles
       }}
       onPointerEnter={onPointerEnter}
       onPointerLeave={onPointerLeave}

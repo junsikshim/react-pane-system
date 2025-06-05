@@ -1,30 +1,6 @@
 import type { Component } from 'react';
 import type { PaneSystemComponentType } from './PaneSystem';
 
-// Convert size to pixels.
-export const sizeToPixels = (size: string | number, relativeTo?: number) => {
-  if (typeof size === 'number') return size;
-
-  const [number, unit] = size.split(/(\d+\.?\d*)/).filter(Boolean);
-
-  // If there's no unit, return the number as is.
-  if (!unit) return +number;
-
-  const parsedNumber = parseFloat(number);
-  const parsedUnit = unit.trim();
-
-  if (Number.isNaN(parsedNumber)) return 0;
-
-  switch (parsedUnit) {
-    case 'px':
-      return parsedNumber;
-    case '%':
-      return (relativeTo ?? 0) * (parsedNumber / 100);
-    default:
-      return 0;
-  }
-};
-
 // Limit the given number to the given range.
 export const limit = (number: number, min: number, max: number) => {
   return Math.min(Math.max(number, min), max);
@@ -52,4 +28,61 @@ export const createId = () => {
 // Check if the given values are approximately equal.
 export const isEqual = (a: number, b: number, epsilon = 1) => {
   return Math.abs(a - b) < epsilon;
+};
+
+// Convert size to pixels
+export const sizeToPixels = (size: string | number, relativeTo: number) => {
+  if (typeof size === 'number') return size;
+
+  // Remove 'calc(' and ')'
+  const exp = size.replace(/calc\(|\)/g, '').trim();
+  const parts = exp.split(/([+\-*/])/).map((p) => p.trim());
+
+  let r = 0;
+  let op = '+';
+
+  for (let i = 0; i < parts.length; i++) {
+    const p = parts[i];
+
+    if (!p) continue;
+
+    // If it's an operator, store it
+    if (['+', '-', '*', '/'].includes(p)) {
+      op = p;
+      continue;
+    }
+
+    let v = 0;
+
+    // Handle each units
+    if (p.includes('%')) {
+      const percent = parseFloat(p);
+      v = (percent / 100) * relativeTo;
+    } else if (p.includes('px')) {
+      v = parseFloat(p);
+    } else {
+      v = parseFloat(p);
+    }
+
+    // Apply the operator
+    switch (op) {
+      case '+':
+        r += v;
+        break;
+
+      case '-':
+        r -= v;
+        break;
+
+      case '*':
+        r *= v;
+        break;
+
+      case '/':
+        r /= v;
+        break;
+    }
+  }
+
+  return r;
 };

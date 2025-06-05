@@ -12,7 +12,8 @@ import {
   createContext,
   useContext,
   Dispatch,
-  useRef
+  useRef,
+  CSSProperties
 } from 'react';
 import { PaneRowProps, InnerPaneRow } from './PaneRow';
 import { sizeToPixels, limit, createId } from './utils';
@@ -44,6 +45,7 @@ interface CorePaneSystemProps extends PropsWithChildren {
   bgColor?: string;
   borderWidth?: number;
   borderColor?: string;
+  borderStyles?: CSSProperties;
   gap?: number;
 }
 
@@ -61,6 +63,7 @@ const CorePaneSystem = ({
   bgColor = '#4b5563',
   borderWidth = 1,
   borderColor = '#909090',
+  borderStyles = {},
   gap = 0,
   children
 }: PropsWithChildren<CorePaneSystemProps>) => {
@@ -167,6 +170,8 @@ const CorePaneSystem = ({
           bgColor: row.props.bgColor ?? bgColor,
           borderWidth: row.props.borderWidth ?? borderWidth,
           borderColor: row.props.borderColor ?? borderColor,
+          borderStyles: row.props.borderStyles ?? borderStyles,
+          styles: row.props.styles,
           gap: row.props.gap ?? gap
         },
         row.props.children
@@ -184,6 +189,7 @@ const CorePaneSystem = ({
     bgColor,
     borderWidth,
     borderColor,
+    borderStyles,
     gap
   ]);
 
@@ -246,6 +252,7 @@ const CorePaneSystem = ({
         const sWidth = rect.width;
         const sHeight = row.props.splitterHeight ?? 4;
         const color = row.props.splitterColor ?? 'rgba(0, 0, 0, 0.2)';
+        const styles = row.props.splitterStyles ?? {};
         const boundMinX = x;
         const boundMaxX = x + sWidth;
         const boundMinY = rect.y;
@@ -270,6 +277,7 @@ const CorePaneSystem = ({
           width: sWidth,
           height: sHeight,
           color,
+          styles,
           bounds: {
             minX: boundMinX,
             minY: boundMinY,
@@ -316,6 +324,7 @@ interface PaneSystemProps extends PropsWithChildren {
   bgColor?: string;
   borderWidth?: number;
   borderColor?: string;
+  borderStyles?: CSSProperties;
   gap?: number;
 }
 

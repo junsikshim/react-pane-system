@@ -1,5 +1,11 @@
 # react-pane-system
 
+## 0.5.0
+
+### Minor Changes
+
+- b15332e: Add 'calc' support and style-related props.
+
 ## 0.4.0
 
 ### Minor Changes

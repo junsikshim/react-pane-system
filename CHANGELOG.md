@@ -1,5 +1,11 @@
 # react-pane-system
 
+## 0.5.1
+
+### Patch Changes
+
+- 138905d: Upgrade storybook action version.
+
 ## 0.5.0
 
 ### Minor Changes

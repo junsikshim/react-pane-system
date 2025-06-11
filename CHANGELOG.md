@@ -1,5 +1,11 @@
 # react-pane-system
 
+## 0.5.2
+
+### Patch Changes
+
+- 9525ca5: Fix resize callback.
+
 ## 0.5.1
 
 ### Patch Changes

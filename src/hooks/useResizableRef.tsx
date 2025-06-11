@@ -7,22 +7,25 @@ const useResizableRef = <T extends HTMLElement>(
   const ref = useRef<T | null>(null);
 
   // Custom ref setter.
-  const setRef = useCallback((node: T) => {
-    if (!node) return;
+  const setRef = useCallback(
+    (node: T) => {
+      if (!node) return;
 
-    // Clean up previous observer.
-    if (ref.current) resizeObserver.current?.unobserve(ref.current);
+      // Clean up previous observer.
+      if (ref.current) resizeObserver.current?.unobserve(ref.current);
 
-    // Create new observer.
-    resizeObserver.current = new ResizeObserver((e) => {
-      const { width, height } = e[0].contentRect;
-      callback(width, height);
-    });
+      // Create new observer.
+      resizeObserver.current = new ResizeObserver((e) => {
+        const { width, height } = e[0].contentRect;
+        callback(width, height);
+      });
 
-    resizeObserver.current.observe(node);
+      resizeObserver.current.observe(node);
 
-    ref.current = node;
-  }, []);
+      ref.current = node;
+    },
+    [callback]
+  );
 
   return [ref, setRef];
 };

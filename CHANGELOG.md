@@ -1,5 +1,11 @@
 # react-pane-system
 
+## 0.5.4
+
+### Patch Changes
+
+- 5fc6993: Fix row height re-adjustment issue.
+
 ## 0.5.3
 
 ### Patch Changes

@@ -138,9 +138,6 @@ const CorePaneSystem = ({
   useIsomorphicLayoutEffect(() => {
     if (containerSize.height === 0) return;
 
-    // Return if the row heights have already been calculated.
-    if (rowHeightPxs.length > 0) return;
-
     const nonAutoHeights = rowHeights.filter((h) => h !== 'auto');
     const autoHeights = rowHeights.filter((h) => h === 'auto');
 
@@ -161,7 +158,14 @@ const CorePaneSystem = ({
     if (autoHeightIndex !== -1)
       nonAutoHeightPxs.splice(autoHeightIndex, 0, autoHeightPx);
 
-    setRowHeightPxs(nonAutoHeightPxs);
+    // Check to see if any row's height has been changed
+    const hasNotChanged = nonAutoHeightPxs.every(
+      (h, i) => h === rowHeightPxs[i]
+    );
+
+    if (!hasNotChanged) {
+      setRowHeightPxs(nonAutoHeightPxs);
+    }
   }, [containerSize.height, gap, rowHeightPxs, rowHeights]);
 
   const rows = useMemo(() => {

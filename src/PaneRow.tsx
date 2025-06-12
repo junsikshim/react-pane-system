@@ -71,8 +71,8 @@ export const InnerPaneRow = ({
   const ref = useRef<HTMLDivElement>(null);
   const splitterIds = useRef<string[]>([]);
 
-  const { addSplitter, removeSplitter } = useContext(SplitterRegistry);
-  const [containerRect] = useContext(PaneSystemRectContext);
+  const { addSplitter } = useContext(SplitterRegistry);
+  const { containerRect } = useContext(PaneSystemRectContext);
 
   // The widths of the Pane components in pixels.
   const [paneWidthPxs, setPaneWidthPxs] = useState<number[]>([]);
@@ -131,7 +131,7 @@ export const InnerPaneRow = ({
       nonAutoWidthPxs.splice(autoWidthIndex, 0, autoWidthPx);
 
     setPaneWidthPxs(nonAutoWidthPxs);
-  }, [containerWidth, paneWidths, paneMinWidthPxs, paneMaxWidthPxs]);
+  }, [containerWidth, gap, paneMaxWidthPxs, paneMinWidthPxs, paneWidths]);
 
   const cols = useMemo(() => {
     let left = 0;
@@ -159,14 +159,14 @@ export const InnerPaneRow = ({
       return c;
     });
   }, [
-    panes,
-    paneWidthPxs,
     bgColor,
-    borderWidth,
     borderColor,
     borderStyles,
-    styles,
-    gap
+    borderWidth,
+    gap,
+    paneWidthPxs,
+    panes,
+    styles
   ]);
 
   // Drag handler for the splitters.
@@ -265,14 +265,14 @@ export const InnerPaneRow = ({
       }
     });
   }, [
-    panes,
-    containerRect,
-    paneWidthPxs,
     addSplitter,
-    removeSplitter,
-    onPaneSplitterDrag,
+    containerRect.left,
+    containerRect.top,
+    gap,
     height,
-    gap
+    onPaneSplitterDrag,
+    paneWidthPxs,
+    panes
   ]);
 
   return (

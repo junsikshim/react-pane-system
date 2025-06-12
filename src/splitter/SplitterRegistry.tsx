@@ -65,7 +65,7 @@ export const SplitterRegistryProvider = ({ children }: PropsWithChildren) => {
 
       setSplitters((prev) => ({ ...prev, [splitter.id]: splitter }));
     },
-    [splitters, setSplitters]
+    [splitters]
   );
 
   const removeSplitter = useCallback((id: string) => {
@@ -129,18 +129,25 @@ export const SplitterRegistryProvider = ({ children }: PropsWithChildren) => {
     return list;
   }, [splittersArray]);
 
+  const r = useMemo(
+    () => ({
+      splitters: splittersArray,
+      addSplitter,
+      removeSplitter,
+      currentSplitterIds,
+      setCurrentSplitterIds,
+      intersections
+    }),
+    [
+      addSplitter,
+      currentSplitterIds,
+      intersections,
+      removeSplitter,
+      splittersArray
+    ]
+  );
+
   return (
-    <SplitterRegistry.Provider
-      value={{
-        splitters: splittersArray,
-        addSplitter,
-        removeSplitter,
-        currentSplitterIds,
-        setCurrentSplitterIds,
-        intersections
-      }}
-    >
-      {children}
-    </SplitterRegistry.Provider>
+    <SplitterRegistry.Provider value={r}>{children}</SplitterRegistry.Provider>
   );
 };

@@ -2,7 +2,6 @@
 
 import {
   PropsWithChildren,
-  useEffect,
   useState,
   Children,
   useMemo,
@@ -33,10 +32,13 @@ import PaneSystemContextRegistry, {
 } from './registry/PaneSystemPresenceContextRegistry';
 import useIsomorphicLayoutEffect from './hooks/useIsomorphicLayoutEffect';
 
-const ContainerSizeContext = createContext<[Size, Dispatch<Size>]>([
-  { width: 0, height: 0 },
-  () => {}
-]);
+const ContainerSizeContext = createContext<{
+  containerSize: Size;
+  setContainerSize: Dispatch<Size>;
+}>({
+  containerSize: { width: 0, height: 0 },
+  setContainerSize: () => {}
+});
 
 interface CorePaneSystemProps extends PropsWithChildren {
   isRoot?: boolean;
@@ -68,11 +70,11 @@ const CorePaneSystem = ({
   children
 }: PropsWithChildren<CorePaneSystemProps>) => {
   // Container size in pixels.
-  const [containerSize, setContainerSize] = useContext(ContainerSizeContext);
+  const { containerSize, setContainerSize } = useContext(ContainerSizeContext);
 
-  const [containerRect, setContainerRect] = useContext(PaneSystemRectContext);
+  const { containerRect, setContainerRect } = useContext(PaneSystemRectContext);
 
-  const [ref, setRef] = useResizableRef<HTMLDivElement>((width, height) => {
+  const { ref, setRef } = useResizableRef<HTMLDivElement>((width, height) => {
     if (!ref.current) return;
 
     // Set the container size.
@@ -82,12 +84,21 @@ const CorePaneSystem = ({
 
     // Set the container rect if this is the top-level PaneSystem.
     const rect = ref.current.getBoundingClientRect();
+
+    if (
+      rect.left === containerRect.left &&
+      rect.top === containerRect.top &&
+      rect.width === containerRect.width &&
+      rect.height === containerRect.height
+    )
+      return;
+
     setContainerRect(rect);
   });
 
   const splitterIds = useRef<string[]>([]);
 
-  const { addSplitter, removeSplitter } = useContext(SplitterRegistry);
+  const { addSplitter } = useContext(SplitterRegistry);
 
   // Row heights in pixels.
   const [rowHeightPxs, setRowHeightPxs] = useState<number[]>([]);
@@ -113,7 +124,7 @@ const CorePaneSystem = ({
       const minHeight = r.props.minHeight ?? 0;
       return sizeToPixels(minHeight, containerSize.height);
     });
-  }, [paneRows, containerSize]);
+  }, [paneRows, containerSize.height]);
 
   // Calculate the row max heights in pixels.
   const rowMaxHeightPxs = useMemo<number[]>(() => {
@@ -121,7 +132,7 @@ const CorePaneSystem = ({
       const maxHeight = r.props.maxHeight ?? '100%';
       return sizeToPixels(maxHeight, containerSize.height) - gap;
     });
-  }, [paneRows, containerSize, gap]);
+  }, [paneRows, containerSize.height, gap]);
 
   // Calculate the row heights in pixels.
   useIsomorphicLayoutEffect(() => {
@@ -151,7 +162,7 @@ const CorePaneSystem = ({
       nonAutoHeightPxs.splice(autoHeightIndex, 0, autoHeightPx);
 
     setRowHeightPxs(nonAutoHeightPxs);
-  }, [containerSize, rowHeights]);
+  }, [containerSize.height, gap, rowHeightPxs, rowHeights]);
 
   const rows = useMemo(() => {
     let top = 0;
@@ -182,15 +193,15 @@ const CorePaneSystem = ({
       return r;
     });
   }, [
-    paneRows,
-    rowHeightPxs,
-    containerSize.width,
-    containerSize.height,
     bgColor,
-    borderWidth,
     borderColor,
     borderStyles,
-    gap
+    borderWidth,
+    containerSize.width,
+    containerSize.height,
+    gap,
+    paneRows,
+    rowHeightPxs
   ]);
 
   // Drag handler for the row splitter.
@@ -289,16 +300,14 @@ const CorePaneSystem = ({
       }
     });
   }, [
-    paneRows,
-    containerRect,
-    containerSize,
-    rowHeightPxs,
     addSplitter,
-    removeSplitter,
+    containerRect.left,
+    containerRect.top,
+    gap,
     onRowSplitterDrag,
-    splitterIds,
+    paneRows,
     ref,
-    gap
+    rowHeightPxs
   ]);
 
   return (
@@ -335,15 +344,21 @@ const PaneSystem = (props: PaneSystemProps) => {
     height: 0
   });
 
+  const r = useMemo(
+    () => ({
+      containerSize,
+      setContainerSize
+    }),
+    [containerSize]
+  );
+
   useNestedPaneSystemChecker();
 
   return (
     <PaneSystemContextRegistry>
       <PaneSystemRectContextProvider>
         <SplitterRegistryProvider>
-          <ContainerSizeContext.Provider
-            value={[containerSize, setContainerSize]}
-          >
+          <ContainerSizeContext.Provider value={r}>
             <CorePaneSystem {...props} isRoot={true} />
           </ContainerSizeContext.Provider>
         </SplitterRegistryProvider>
@@ -371,7 +386,7 @@ export const InnerPaneSystem = ({
     height: 0
   });
 
-  useEffect(() => {
+  useIsomorphicLayoutEffect(() => {
     if (!parentContainerSize) return;
 
     const { width, height } = parentContainerSize;
@@ -380,8 +395,16 @@ export const InnerPaneSystem = ({
     if (height) setContainerSize((prev) => ({ ...prev, height }));
   }, [parentContainerSize]);
 
+  const r = useMemo(
+    () => ({
+      containerSize,
+      setContainerSize
+    }),
+    [containerSize]
+  );
+
   return (
-    <ContainerSizeContext.Provider value={[containerSize, setContainerSize]}>
+    <ContainerSizeContext.Provider value={r}>
       <CorePaneSystem {...props} />
     </ContainerSizeContext.Provider>
   );

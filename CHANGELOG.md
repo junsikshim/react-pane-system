@@ -1,5 +1,11 @@
 # react-pane-system
 
+## 0.5.3
+
+### Patch Changes
+
+- 3874ef6: Fix over-rendering issue.
+
 ## 0.5.2
 
 ### Patch Changes

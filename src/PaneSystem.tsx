@@ -77,8 +77,10 @@ const CorePaneSystem = ({
   const { ref, setRef } = useResizableRef<HTMLDivElement>((width, height) => {
     if (!ref.current) return;
 
-    // Set the container size.
-    setContainerSize({ width, height });
+    // If the size has changed, set the container size.
+    if (width !== containerSize.width || height !== containerSize.height) {
+      setContainerSize({ width, height });
+    }
 
     if (!isRoot) return;
 

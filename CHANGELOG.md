@@ -1,5 +1,11 @@
 # react-pane-system
 
+## 0.5.5
+
+### Patch Changes
+
+- 44f9d88: Fix container size bug.
+
 ## 0.5.4
 
 ### Patch Changes

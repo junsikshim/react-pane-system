@@ -1,5 +1,11 @@
 # react-pane-system
 
+## 0.5.6
+
+### Patch Changes
+
+- 8bf3934: Splitters were not updated upon size change
+
 ## 0.5.5
 
 ### Patch Changes

@@ -61,7 +61,14 @@ export const SplitterRegistryProvider = ({ children }: PropsWithChildren) => {
       const s = splitters[splitter.id];
 
       // If the splitter with the same values already exists, return.
-      if (s && s.x === splitter.x && s.y === splitter.y) return;
+      if (
+        s &&
+        s.x === splitter.x &&
+        s.y === splitter.y &&
+        s.width === splitter.width &&
+        s.height === splitter.height
+      )
+        return;
 
       setSplitters((prev) => ({ ...prev, [splitter.id]: splitter }));
     },
